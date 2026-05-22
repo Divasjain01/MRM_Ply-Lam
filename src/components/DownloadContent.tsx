@@ -1,10 +1,9 @@
 import { useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { Download, FileText, FolderKanban, Lock, Shapes } from "lucide-react"
+import { Download, FileText, FolderKanban, Shapes } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useAuth } from "@/hooks/useAuth"
 import { catalogAssets, categoryMeta } from "@/lib/site-content"
 
 const categories = Object.values(categoryMeta)
@@ -12,51 +11,19 @@ const categories = Object.values(categoryMeta)
 const DownloadContent = () => {
   const [selectedCategory, setSelectedCategory] = useState<(typeof categories)[number]["key"]>("plyandboards")
   const navigate = useNavigate()
-  const { user } = useAuth()
 
   const assets = useMemo(
     () => catalogAssets.filter((asset) => asset.category === selectedCategory),
     [selectedCategory],
   )
 
-  const handleDownload = (url: string, title: string, requiresAuth?: boolean) => {
-    if (requiresAuth && !user) {
-      navigate("/login")
-      return
-    }
-
+  const handleDownload = (url: string, title: string) => {
     console.log(`Downloading: ${title}`)
     window.open(url, "_blank")
   }
 
   return (
     <div className="space-y-8 sm:space-y-10">
-      {!user && (
-        <Card className="rounded-[24px] border-amber-200 bg-[#fff5ec] shadow-none sm:rounded-[28px]">
-          <CardContent className="flex flex-col gap-4 p-4 sm:p-6 lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex items-start gap-3">
-              <Lock className="mt-1 h-5 w-5 text-[#f26a21]" />
-              <div>
-                <h3 className="text-lg font-semibold text-[#2b2b2b]">Login unlocks protected catalog assets</h3>
-                <p className="mt-1 text-sm leading-6 text-[#6e6e6e]">
-                  Public brochures remain browseable, while technical sheets and deeper specification files can be kept
-                  behind dealer or customer login as the library grows.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <Button variant="outline" className="h-11 rounded-full bg-transparent" onClick={() => navigate("/login")}>
-                Login
-              </Button>
-              <Button variant="primary" className="h-11 rounded-full" onClick={() => navigate("/login")}>
-                Register
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
       <section className="rounded-[26px] border border-black/6 bg-white p-4 shadow-[0_16px_60px_rgba(34,24,16,0.06)] sm:rounded-[34px] sm:p-8">
         <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
           <div>
@@ -129,12 +96,12 @@ const DownloadContent = () => {
 
                       <div className="mt-5 flex flex-col gap-3 border-t border-black/6 pt-4 sm:mt-6 sm:flex-row sm:items-center sm:justify-between">
                         <div className="text-[11px] uppercase tracking-[0.16em] text-[#8b6b52] sm:text-xs">
-                          {asset.requiresAuth ? "Protected asset" : "Public asset"}
+                          Ready to view
                         </div>
                         <Button
-                          variant={asset.requiresAuth ? "outline" : "primary"}
+                          variant="primary"
                           className="h-11 rounded-full"
-                          onClick={() => handleDownload(asset.url, asset.title, asset.requiresAuth)}
+                          onClick={() => handleDownload(asset.url, asset.title)}
                         >
                           <Download className="h-4 w-4" />
                           Download

@@ -32,7 +32,6 @@ export interface CatalogAsset {
   url: string
   category: ProductCategory
   collectionId?: string
-  requiresAuth?: boolean
 }
 
 export const categoryMeta: Record<ProductCategory, CategoryMeta> = {
@@ -219,7 +218,6 @@ export const catalogAssets: CatalogAsset[] = [
     fileSize: "2.8 MB",
     url: "/brochures/technical-specifications.pdf",
     category: "plyandboards",
-    requiresAuth: true,
   },
   {
     id: "laminates-catalogue",
@@ -240,7 +238,6 @@ export const catalogAssets: CatalogAsset[] = [
     fileSize: "4.1 MB",
     url: "/brochures/installation-guidelines.pdf",
     category: "laminates",
-    requiresAuth: true,
   },
   {
     id: "veneer-louver-catalogue",
@@ -254,23 +251,22 @@ export const catalogAssets: CatalogAsset[] = [
   },
   {
     id: "louvers-spec-file",
-    title: "Louver Specification File",
-    description: "Profile overview, application guidance, and reference information for future projects.",
+    title: "MRM Louvers Catalogue",
+    description: "Louver range overview with design direction and product reference for architectural applications.",
     type: "Specification File",
     format: "PDF",
-    fileSize: "1.9 MB",
-    url: "/brochures/care-maintenance.pdf",
+    fileSize: "Available PDF",
+    url: "/catalogs/louvers/MRM_Louvers.pdf",
     category: "louvers",
-    requiresAuth: true,
   },
   {
     id: "liners-catalogue",
-    title: "Laminate Liners Product Sheet",
-    description: "A concise catalogue covering sizes, thicknesses, and recommended cabinet applications.",
+    title: "MRM Inner Laminates and Liner",
+    description: "Product catalogue covering inner laminate and liner surfaces for cabinetry and utility applications.",
     type: "Catalogue",
     format: "PDF",
-    fileSize: "3.6 MB",
-    url: "/brochures/ply-boards-laminates.pdf",
+    fileSize: "Available PDF",
+    url: "/catalogs/laminateliners/MRM%20Inner%20Laminates%20and%20Liner.pdf",
     category: "laminateliners",
   },
 ]
