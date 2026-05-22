@@ -1,12 +1,12 @@
-import { useState, useEffect } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { Link } from "react-router-dom"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { productsData, type ProductCategory } from "@/data/enhanced-products"
 import ProductCategoryNav from "@/components/ProductCategoryNav"
+import ProductCard from "@/components/ProductCard"
 import { slugify } from "@/lib/products"
+import { categoryMeta, getCategoryCatalogAssets } from "@/lib/site-content"
 
 interface ProductsContentProps {
   category?: ProductCategory
@@ -18,7 +18,9 @@ const ProductsContent = ({ category }: ProductsContentProps) => {
   const [warrantyFilter, setWarrantyFilter] = useState<string>("all")
   const [finishFilter, setFinishFilter] = useState<string>("all")
 
-  const products = productsData[selectedCategory]
+  useEffect(() => {
+    if (category) setSelectedCategory(category)
+  }, [category])
 
   useEffect(() => {
     setThicknessFilter("all")
@@ -26,7 +28,12 @@ const ProductsContent = ({ category }: ProductsContentProps) => {
     setFinishFilter("all")
   }, [selectedCategory])
 
-  const getFilterOptions = () => {
+  const activeCategory = category || selectedCategory
+  const activeMeta = categoryMeta[activeCategory]
+  const products = productsData[activeCategory]
+  const catalogAssets = getCategoryCatalogAssets(activeCategory)
+
+  const filterOptions = useMemo(() => {
     const thicknesses = new Set<string>()
     const warranties = new Set<string>()
     const finishes = new Set<string>()
@@ -35,49 +42,96 @@ const ProductsContent = ({ category }: ProductsContentProps) => {
       product.thicknessOptions?.forEach((thickness) => thicknesses.add(`${thickness}mm`))
       if (product.warranty) warranties.add(product.warranty)
       if (product.specifications?.finish) finishes.add(product.specifications.finish)
+      if (product.specifications?.["Surface Texture"]) finishes.add(product.specifications["Surface Texture"])
     })
 
     return {
-      thicknesses: Array.from(thicknesses).sort(),
+      thicknesses: Array.from(thicknesses).sort((a, b) => Number.parseFloat(a) - Number.parseFloat(b)),
       warranties: Array.from(warranties),
       finishes: Array.from(finishes),
     }
-  }
+  }, [products])
 
-  const filterOptions = getFilterOptions()
-
-  const filteredProducts = products.filter((product) => {
-    if (thicknessFilter !== "all" && !product.thicknessOptions?.some((t) => `${t}mm` === thicknessFilter)) {
-      return false
-    }
-    if (warrantyFilter !== "all" && product.warranty !== warrantyFilter) {
-      return false
-    }
-    if (finishFilter !== "all" && product.specifications?.finish !== finishFilter) {
-      return false
-    }
-    return true
-  })
+  const filteredProducts = useMemo(
+    () =>
+      products.filter((product) => {
+        if (thicknessFilter !== "all" && !product.thicknessOptions?.some((t) => `${t}mm` === thicknessFilter)) {
+          return false
+        }
+        if (warrantyFilter !== "all" && product.warranty !== warrantyFilter) {
+          return false
+        }
+        const finish = product.specifications?.finish || product.specifications?.["Surface Texture"]
+        if (finishFilter !== "all" && finish !== finishFilter) {
+          return false
+        }
+        return true
+      }),
+    [products, thicknessFilter, warrantyFilter, finishFilter],
+  )
 
   return (
-    <div className="space-y-8" data-products-section>
-      {/* Category Navigation - only show if no specific category */}
+    <div className="space-y-8 sm:space-y-10">
       {!category && <ProductCategoryNav activeCategory={selectedCategory} onChange={setSelectedCategory} />}
 
       {category && (
-        <div className="bg-muted/30 rounded-xl p-6">
-          <h3 className="text-lg font-semibold text-foreground mb-4">Filter Products</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Thickness Filter */}
+        <section className="overflow-hidden rounded-[28px] border border-black/6 bg-[#fbf8f3] sm:rounded-[34px]">
+          <div className="grid gap-0 lg:grid-cols-[1.2fr_0.8fr]">
+            <div className="px-4 py-6 sm:px-8 sm:py-10 lg:px-10 lg:py-12">
+              <div className="text-[0.72rem] uppercase tracking-[0.24em] text-[#8b6b52]">{activeMeta.eyebrow}</div>
+              <h2 className="mt-3 max-w-2xl text-2xl font-semibold tracking-tight text-[#2b2b2b] sm:text-4xl">
+                {activeMeta.label}
+              </h2>
+              <p className="mt-4 max-w-2xl text-sm leading-7 text-[#6e6e6e] sm:text-lg sm:leading-8">{activeMeta.description}</p>
+
+              <div className="mt-6 grid gap-3 sm:mt-8 sm:grid-cols-3">
+                <div className="rounded-[22px] bg-white px-4 py-4 shadow-sm">
+                  <div className="text-[0.66rem] uppercase tracking-[0.2em] text-[#8b6b52]">Category</div>
+                  <div className="mt-2 text-base font-semibold text-[#2b2b2b] sm:text-lg">{activeMeta.label}</div>
+                </div>
+                <div className="rounded-[22px] bg-white px-4 py-4 shadow-sm">
+                  <div className="text-[0.66rem] uppercase tracking-[0.2em] text-[#8b6b52]">Products</div>
+                  <div className="mt-2 text-2xl font-semibold text-[#2b2b2b]">{products.length}</div>
+                </div>
+                <div className="rounded-[22px] bg-white px-4 py-4 shadow-sm">
+                  <div className="text-[0.66rem] uppercase tracking-[0.2em] text-[#8b6b52]">Catalog Assets</div>
+                  <div className="mt-2 text-2xl font-semibold text-[#2b2b2b]">{catalogAssets.length}</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="min-h-[220px] lg:min-h-full">
+              <img src={activeMeta.heroImage} alt={activeMeta.label} className="h-full w-full object-cover" />
+            </div>
+          </div>
+        </section>
+      )}
+
+      <section className="rounded-[28px] border border-black/6 bg-white p-4 shadow-[0_16px_60px_rgba(34,24,16,0.06)] sm:rounded-[32px] sm:p-8">
+        <div className="mb-5 flex flex-col gap-4 lg:mb-6 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <div className="text-[0.72rem] uppercase tracking-[0.24em] text-[#8b6b52]">Product Index</div>
+            <h3 className="mt-2 text-2xl font-semibold text-[#2b2b2b]">Explore the range</h3>
+            {!category && (
+              <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+                <div className="inline-flex w-fit items-center rounded-full bg-[#fff4eb] px-4 py-2 text-sm font-medium text-[#2b2b2b]">
+                  {activeMeta.label}
+                </div>
+                <p className="max-w-2xl text-sm leading-7 text-[#6e6e6e]">{activeMeta.shortDescription}</p>
+              </div>
+            )}
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 xl:grid-cols-3">
             {filterOptions.thicknesses.length > 0 && (
               <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-2">Thickness</label>
+                <label className="mb-2 block text-xs font-medium uppercase tracking-[0.16em] text-[#8b6b52]">Thickness</label>
                 <Select value={thicknessFilter} onValueChange={setThicknessFilter}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="All Thicknesses" />
+                  <SelectTrigger className="h-11 rounded-full border-[#eadfce] bg-[#fbf8f3]">
+                    <SelectValue placeholder="All thicknesses" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Thicknesses</SelectItem>
+                    <SelectItem value="all">All thicknesses</SelectItem>
                     {filterOptions.thicknesses.map((thickness) => (
                       <SelectItem key={thickness} value={thickness}>
                         {thickness}
@@ -88,16 +142,15 @@ const ProductsContent = ({ category }: ProductsContentProps) => {
               </div>
             )}
 
-            {/* Warranty Filter */}
             {filterOptions.warranties.length > 0 && (
               <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-2">Warranty</label>
+                <label className="mb-2 block text-xs font-medium uppercase tracking-[0.16em] text-[#8b6b52]">Warranty</label>
                 <Select value={warrantyFilter} onValueChange={setWarrantyFilter}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="All Warranties" />
+                  <SelectTrigger className="h-11 rounded-full border-[#eadfce] bg-[#fbf8f3]">
+                    <SelectValue placeholder="All warranties" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Warranties</SelectItem>
+                    <SelectItem value="all">All warranties</SelectItem>
                     {filterOptions.warranties.map((warranty) => (
                       <SelectItem key={warranty} value={warranty}>
                         {warranty}
@@ -108,16 +161,15 @@ const ProductsContent = ({ category }: ProductsContentProps) => {
               </div>
             )}
 
-            {/* Finish Filter */}
             {filterOptions.finishes.length > 0 && (
-              <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-2">Finish</label>
+              <div className="col-span-2 xl:col-span-1">
+                <label className="mb-2 block text-xs font-medium uppercase tracking-[0.16em] text-[#8b6b52]">Finish</label>
                 <Select value={finishFilter} onValueChange={setFinishFilter}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="All Finishes" />
+                  <SelectTrigger className="h-11 rounded-full border-[#eadfce] bg-[#fbf8f3]">
+                    <SelectValue placeholder="All finishes" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Finishes</SelectItem>
+                    <SelectItem value="all">All finishes</SelectItem>
                     {filterOptions.finishes.map((finish) => (
                       <SelectItem key={finish} value={finish}>
                         {finish}
@@ -129,127 +181,69 @@ const ProductsContent = ({ category }: ProductsContentProps) => {
             )}
           </div>
         </div>
-      )}
 
-      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-        {filteredProducts.map((product, index) => (
-          <Link
-            key={index}
-            to={`/products/${category || selectedCategory}/${slugify(product.name)}`}
-            className="animate-fade-in"
-            style={{ animationDelay: `${index * 100}ms` }}
-          >
-            <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group h-full flex flex-col">
-              {/* Image Section */}
-              <div className="relative w-full overflow-hidden bg-white flex items-center justify-center p-1">
-                {/* ✅ Always pull directly from /assets */}
-                {(() => {
-                  const primaryImg = product.image?.startsWith("/")
-                    ? product.image
-                    : `/assets/${product.image || "placeholder.svg"}`
+        {filteredProducts.length > 0 ? (
+          <div className="grid gap-4 sm:gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {filteredProducts.map((product) => (
+              <ProductCard
+                key={product.name}
+                product={product}
+                href={`/products/${activeCategory}/${slugify(product.name)}`}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-[24px] bg-[#fbf8f3] px-5 py-8 text-center sm:px-6 sm:py-10">
+            <p className="text-base text-[#6e6e6e] sm:text-lg">No products match the current filters.</p>
+            <Button
+              variant="link"
+              onClick={() => {
+                setThicknessFilter("all")
+                setWarrantyFilter("all")
+                setFinishFilter("all")
+              }}
+              className="mt-3 text-[#f26a21]"
+            >
+              Reset filters
+            </Button>
+          </div>
+        )}
+      </section>
 
-                  return (
-                    <img
-                      src={primaryImg}
-                      alt={product.name}
-                      loading="lazy"
-                      className="w-full h-auto object-contain transition-transform duration-300 group-hover:scale-105"
-                    />
-                  )
-                })()}
-
-              </div>
-
-              <CardContent className="p-3 pt-2 flex-1 flex flex-col">
-                {/* Main content container */}
-                <div className="flex-1">
-                  <h3 className="text-lg font-bold text-foreground mb-1 line-clamp-2 leading-tight">{product.name}</h3>
-                  <p className="text-muted-foreground mb-2.5 text-sm text-pretty leading-relaxed line-clamp-3">{product.description}</p>
-
-                  <div className="space-y-1 mb-2.5">
-                    {product.thicknessOptions && (
-                      <div className="text-xs text-muted-foreground">
-                        <span className="font-medium">Thickness:</span> {product.thicknessOptions.join(", ")}mm
-                      </div>
-                    )}
-                    {product.specifications?.finish && (
-                      <div className="text-xs text-muted-foreground">
-                        <span className="font-medium">Finish:</span> {product.specifications.finish}
-                      </div>
-                    )}
-                  </div>
-
-                  {product.warranty && (
-                    <Badge variant="secondary" className="mb-2 text-xs">
-                      {product.warranty}
-                    </Badge>
-                  )}
-
-                  {product.tags && (
-                    <div className="flex flex-wrap gap-1 mb-2.5">
-                      {product.tags.slice(0, 2).map((tag, tagIndex) => (
-                        <Badge key={tagIndex} variant="outline" className="text-xs px-2 py-0">
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* Button container - pushed to bottom */}
-                <div className="mt-auto">
-                  <span className="text-primary font-semibold text-sm group-hover:text-primary/80 transition-colors">
-                    View Details →
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
+      <section className="rounded-[28px] border border-black/6 bg-[#2b2b2b] p-5 text-white shadow-[0_16px_60px_rgba(34,24,16,0.12)] sm:rounded-[32px] sm:p-8">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-2xl">
+            <div className="text-[0.72rem] uppercase tracking-[0.24em] text-white/46">Catalog Integration</div>
+            <h3 className="mt-2 text-2xl font-semibold">Support this category with curated documentation</h3>
+            <p className="mt-3 text-sm leading-7 text-white/70 sm:text-base">
+              The product range stays simple to browse, while catalogues and specification files remain connected to each
+              category for future expansion.
+            </p>
+          </div>
+          <Link to="/catalogs">
+            <Button variant="primary" className="w-full rounded-full sm:w-auto">
+              Open Catalogs
+            </Button>
           </Link>
-        ))}
-      </div>
-
-      {filteredProducts.length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-muted-foreground text-lg">No products match your current filters.</p>
-          <Button
-            variant="link"
-            onClick={() => {
-              setThicknessFilter("all")
-              setWarrantyFilter("all")
-              setFinishFilter("all")
-            }}
-            className="mt-4"
-          >
-            Clear all filters
-          </Button>
         </div>
-      )}
 
-      {/* Category Info */}
-      <div className="bg-muted/30 rounded-xl p-6">
-        <h3 className="text-xl font-bold text-foreground mb-3">
-          About {(category || selectedCategory).charAt(0).toUpperCase() + (category || selectedCategory).slice(1)}
-        </h3>
-        <p className="text-muted-foreground leading-relaxed">{getCategoryDescription(category || selectedCategory)}</p>
-      </div>
+        <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3 sm:mt-8">
+          {catalogAssets.map((asset) => (
+            <div key={asset.id} className="rounded-[24px] border border-white/10 bg-white/6 p-5">
+              <div className="flex items-center justify-between gap-3">
+                <div className="text-[0.66rem] uppercase tracking-[0.18em] text-white/45">{asset.type}</div>
+                <div className="text-xs text-white/52">
+                  {asset.format} · {asset.fileSize}
+                </div>
+              </div>
+              <div className="mt-3 text-lg font-semibold">{asset.title}</div>
+              <p className="mt-2 text-sm leading-6 text-white/70">{asset.description}</p>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   )
-}
-
-function getCategoryDescription(category: ProductCategory): string {
-  const descriptions = {
-    plyandboards:
-      "Our premium plywood and blockboards range offers exceptional durability and versatility for all construction and furniture applications. From BWP grade plywood for exterior use to MR grade for interior applications, and high-strength blockboards for superior stability, we provide solutions for every need.",
-    laminateliners:
-      "MRM Laminate Liners made from kraft paper for wardrobes, cabinets & drawers. 8x4 ft sheets in 0.7mm & 0.8mm thickness. Available at M Cube Spaces and our Experience Center.",
-    laminates:
-      "Designer laminates that transform ordinary surfaces into extraordinary spaces. Available in woodgrain, stone, and solid color finishes to match any design aesthetic and functional requirement.",
-    louvers:
-      "Elegant architectural louvers that combine functionality with aesthetic appeal. Perfect for feature walls, ceiling designs, and ventilation applications in modern interiors.",
-    veneers:
-      "Premium natural wood veneers that bring the beauty of real wood to your projects. Carefully selected and processed to maintain the natural grain patterns and characteristics of each wood species.",
-  }
-  return descriptions[category]
 }
 
 export default ProductsContent

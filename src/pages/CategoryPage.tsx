@@ -3,56 +3,42 @@ import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import ProductsContent from "@/components/ProductsContent"
 import { productsData, type ProductCategory } from "@/data/enhanced-products"
+import { categoryMeta } from "@/lib/site-content"
 
 const CategoryPage = () => {
   const { slug } = useParams<{ slug: string }>()
 
-  // Validate category
   if (!slug || !Object.keys(productsData).includes(slug)) {
     return (
       <div className="min-h-screen bg-white">
         <Header />
-        <div className="container mx-auto px-4 py-16 text-center">
-          <h1 className="text-4xl font-bold mb-4">Category Not Found</h1>
-          <p className="text-muted-foreground">The requested product category does not exist.</p>
+        <div className="mx-auto max-w-7xl px-4 py-20 text-center sm:px-6 lg:px-8">
+          <h1 className="text-4xl font-semibold text-[#2b2b2b]">Category not found</h1>
+          <p className="mt-4 text-[#6e6e6e]">The requested material family does not exist.</p>
         </div>
         <Footer />
       </div>
     )
   }
 
-  const categoryName = slug.charAt(0).toUpperCase() + slug.slice(1)
-
-  function getCategoryDescription(category: ProductCategory): string {
-    const descriptions = {
-      plyandboards: "Premium plywood and blockboards for construction and furniture applications",
-      laminateliners: "Laminate liners for interior surface protection and finishing",
-      laminates: "Designer laminates that transform ordinary surfaces into extraordinary spaces",
-      louvers: "Elegant architectural louvers combining functionality with aesthetic appeal",
-      veneers: "Premium natural wood veneers bringing authentic wood beauty to your projects",
-    }
-    return descriptions[category]
-  }
+  const meta = categoryMeta[slug as ProductCategory]
 
   return (
     <div className="min-h-screen bg-white">
       <Header />
 
-      {/* Hero Section */}
-      <section className="relative py-20 bg-gradient-to-br from-amber-50 to-orange-50">
-        <div className="max-w-7xl mx-auto px-6 text-center">
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-800 mb-6 animate-fade-in text-balance">
-            {categoryName}
+      <section className="overflow-hidden border-b border-black/5 bg-[#f7f1e7]">
+        <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-18">
+          <div className="text-[0.72rem] uppercase tracking-[0.24em] text-[#8b6b52]">{meta.eyebrow}</div>
+          <h1 className="mt-3 max-w-4xl text-4xl font-semibold tracking-tight text-[#2b2b2b] sm:text-5xl lg:text-6xl">
+            {meta.label}
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto animate-fade-in animate-stagger-2 text-pretty">
-            {getCategoryDescription(slug as ProductCategory)}
-          </p>
+          <p className="mt-5 max-w-3xl text-base leading-8 text-[#6e6e6e] sm:text-lg">{meta.description}</p>
         </div>
       </section>
 
-      {/* Products Content */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-6">
+      <section className="py-12 sm:py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <ProductsContent category={slug as ProductCategory} />
         </div>
       </section>

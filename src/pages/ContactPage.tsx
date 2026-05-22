@@ -4,13 +4,62 @@ import { useState } from "react"
 import { Link } from "react-router-dom"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
-import { MapPin, Phone, Mail, Clock, Send, Headphones, CheckCircle } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { CheckCircle, Clock, Headphones, Mail, MapPin, MessageSquare, Phone, Send } from "lucide-react"
+
+const contactMethods = [
+  {
+    icon: Phone,
+    title: "Call Us",
+    description: "Speak directly with our team for product guidance, dealer enquiries, and support.",
+    contact: "+91 96290 15535",
+    hours: "Mon-Sat: 9AM-6PM IST",
+    action: "Call now",
+  },
+  {
+    icon: Mail,
+    title: "Email Support",
+    description: "Share project details or documentation requests and we will respond within one business day.",
+    contact: "info@mrmplylam.com",
+    hours: "24 hour response",
+    action: "Send email",
+  },
+]
+
+const storeHighlights = [
+  { id: 1, name: "MRM PLY LAM LLP", image: "/modern-plywood-store-exterior-downtown.jpg", city: "Coimbatore" },
+  { id: 2, name: "MAHAVIR LAMINATES", image: "/large-plywood-showroom-midtown-storefront.jpg", city: "Coimbatore" },
+  { id: 3, name: "M CUBE SPACES LLP", image: "/industrial-plywood-warehouse-brooklyn-exterior.jpg", city: "Bengaluru" },
+  { id: 4, name: "MAHAVIR WOODS N VENEER", image: "/modern-wood-materials-store-queens-storefront.jpg", city: "Chennai" },
+]
+
+const faqs = [
+  {
+    question: "What are your response times?",
+    answer:
+      "Phone calls are handled during business hours, and email enquiries are typically answered within 24 hours.",
+  },
+  {
+    question: "Can I get product or technical guidance?",
+    answer:
+      "Yes. We can help with product shortlisting, catalog guidance, and material-related support before purchase.",
+  },
+  {
+    question: "Do you support dealership enquiries?",
+    answer:
+      "Yes. Use the contact form or call us directly and our team will guide you through the next steps.",
+  },
+  {
+    question: "Can I visit a store instead?",
+    answer:
+      "Yes. You can browse our store network and visit the nearest location for a more in-person consultation.",
+  },
+]
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -29,136 +78,105 @@ export default function ContactPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // Simulate form submission
     setIsSubmitted(true)
     setTimeout(() => setIsSubmitted(false), 3000)
-  }
-
-  const contactMethods = [
-    {
-      icon: Phone,
-      title: "Call Us",
-      description: "Speak directly with our customer service team",
-      contact: "+91 96290 15535",
-      hours: "Mon-Sat: 9AM-6PM IST",
-      action: "Call Now",
-    },
-    {
-      icon: Mail,
-      title: "Email Support",
-      description: "Send us a detailed message and we'll respond within 24 hours",
-      contact: "info@mrmplylam.com",
-      hours: "24/7 Response",
-      action: "Send Email",
-    },
-  ]
-
-  const storeLocation = {
-    name: "MRM Ply & Lam LLP (Main Office)",
-    address: "No. 170, Mettupalayam Road",
-    city: "Coimbatore, Tamil Nadu 641043",
-    phone: "+91 96290 15535",
-    email: "info@mrmplylam.com",
-    hours: {
-      weekdays: "Monday - Friday: 9:00 AM - 6:00 PM",
-      saturday: "Saturday: 9:00 AM - 4:00 PM",
-      sunday: "Sunday: Closed"
-    }
   }
 
   return (
     <div className="min-h-screen bg-white">
       <Header />
       <main>
-      {/* Hero Section */}
-      <section className="py-16 bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6 text-balance">Get in Touch</h1>
-          <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto text-pretty leading-relaxed">
-            We're here to help with any questions, support needs, or partnership opportunities. Reach out to us through
-            your preferred method.
-          </p>
-        </div>
-      </section>
+        <section className="overflow-hidden border-b border-black/5 bg-[#f7f1e7]">
+          <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8 lg:py-18">
+            <div className="text-[0.72rem] uppercase tracking-[0.24em] text-[#8b6b52]">Contact</div>
+            <h1 className="mt-3 max-w-4xl text-3xl font-semibold tracking-tight text-[#2b2b2b] sm:text-5xl lg:text-6xl">
+              Reach MRM through the same clear, premium experience as the rest of the platform.
+            </h1>
+            <p className="mt-4 max-w-3xl text-sm leading-7 text-[#6e6e6e] sm:mt-5 sm:text-lg sm:leading-8">
+              Connect for product enquiries, dealership conversations, support requests, or store visits through a
+              more refined and structured contact journey.
+            </p>
+          </div>
+        </section>
 
-      {/* Contact Form and Contact Methods */}
-      <section className="py-16 bg-gradient-to-r from-amber-50 to-orange-50">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Contact Form - Takes 2 columns */}
-            <div className="lg:col-span-2">
-              <Card className="shadow-xl h-full">
-                <CardHeader>
-                  <CardTitle className="text-2xl flex items-center">
-                    <Send className="mr-2 h-6 w-6" />
-                    Send Us a Message
-                  </CardTitle>
-                  <p className="text-muted-foreground">
-                    Fill out the form below and we'll get back to you as soon as possible.
-                  </p>
-                </CardHeader>
-                <CardContent>
+        <section className="py-12 sm:py-16">
+          <div className="mx-auto max-w-7xl space-y-8 px-4 sm:space-y-10 sm:px-6 lg:px-8">
+            <section className="grid gap-5 sm:gap-6 lg:grid-cols-[1.08fr_0.92fr]">
+              <Card className="rounded-[26px] border-black/6 shadow-[0_16px_60px_rgba(34,24,16,0.06)] sm:rounded-[34px]">
+                <CardContent className="p-5 sm:p-8">
+                  <div className="mb-6">
+                    <div className="text-[0.72rem] uppercase tracking-[0.24em] text-[#8b6b52]">Send A Message</div>
+                    <h2 className="mt-2 text-2xl font-semibold text-[#2b2b2b] sm:text-3xl">Tell us what you need</h2>
+                    <p className="mt-2 text-sm leading-7 text-[#6e6e6e]">
+                      Share your project, product requirement, or support query and our team will get back to you.
+                    </p>
+                  </div>
+
                   {isSubmitted ? (
-                    <div className="text-center py-8">
-                      <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
-                      <h3 className="text-xl font-semibold mb-2">Message Sent Successfully!</h3>
-                      <p className="text-muted-foreground">
-                        Thank you for contacting us. We'll respond within 24 hours.
+                    <div className="rounded-[24px] bg-[#fbf8f3] px-5 py-10 text-center">
+                      <CheckCircle className="mx-auto h-14 w-14 text-green-600" />
+                      <h3 className="mt-4 text-xl font-semibold text-[#2b2b2b]">Message sent successfully</h3>
+                      <p className="mt-2 text-sm leading-7 text-[#6e6e6e]">
+                        Thank you for contacting us. We will respond as soon as possible.
                       </p>
                     </div>
                   ) : (
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                      <div>
-                        <Label htmlFor="name">Full Name *</Label>
-                        <Input
-                          id="name"
-                          name="name"
-                          value={formData.name}
-                          onChange={handleInputChange}
-                          required
-                          className="mt-1"
-                        />
+                    <form onSubmit={handleSubmit} className="space-y-5">
+                      <div className="grid gap-5 sm:grid-cols-2">
+                        <div>
+                          <Label htmlFor="name">Full Name *</Label>
+                          <Input
+                            id="name"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleInputChange}
+                            required
+                            className="mt-2 h-12 rounded-full border-[#eadfce] bg-[#fbf8f3] px-4"
+                          />
+                        </div>
+
+                        <div>
+                          <Label htmlFor="email">Email Address *</Label>
+                          <Input
+                            id="email"
+                            name="email"
+                            type="email"
+                            value={formData.email}
+                            onChange={handleInputChange}
+                            required
+                            className="mt-2 h-12 rounded-full border-[#eadfce] bg-[#fbf8f3] px-4"
+                          />
+                        </div>
                       </div>
 
-                      <div>
-                        <Label htmlFor="email">Email Address *</Label>
-                        <Input
-                          id="email"
-                          name="email"
-                          type="email"
-                          value={formData.email}
-                          onChange={handleInputChange}
-                          required
-                          className="mt-1"
-                        />
-                      </div>
+                      <div className="grid gap-5 sm:grid-cols-2">
+                        <div>
+                          <Label htmlFor="phone">Phone Number</Label>
+                          <Input
+                            id="phone"
+                            name="phone"
+                            type="tel"
+                            value={formData.phone}
+                            onChange={handleInputChange}
+                            className="mt-2 h-12 rounded-full border-[#eadfce] bg-[#fbf8f3] px-4"
+                          />
+                        </div>
 
-                      <div>
-                        <Label htmlFor="phone">Phone Number</Label>
-                        <Input
-                          id="phone"
-                          name="phone"
-                          type="tel"
-                          value={formData.phone}
-                          onChange={handleInputChange}
-                          className="mt-1"
-                        />
-                      </div>
-
-                      <div>
-                        <Label htmlFor="inquiryType">Inquiry Type</Label>
-                        <select
-                          id="inquiryType"
-                          name="inquiryType"
-                          value={formData.inquiryType}
-                          onChange={handleInputChange}
-                          className="w-full mt-1 px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                        >
-                          <option value="general">General</option>
-                          <option value="product">Product Enquiry</option>
-                          <option value="dealership">Dealership</option>
-                          <option value="others">Others</option>
-                        </select>
+                        <div>
+                          <Label htmlFor="inquiryType">Inquiry Type</Label>
+                          <select
+                            id="inquiryType"
+                            name="inquiryType"
+                            value={formData.inquiryType}
+                            onChange={handleInputChange}
+                            className="mt-2 h-12 w-full rounded-full border border-[#eadfce] bg-[#fbf8f3] px-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                          >
+                            <option value="general">General</option>
+                            <option value="product">Product enquiry</option>
+                            <option value="dealership">Dealership</option>
+                            <option value="others">Others</option>
+                          </select>
+                        </div>
                       </div>
 
                       <div>
@@ -169,174 +187,165 @@ export default function ContactPage() {
                           value={formData.message}
                           onChange={handleInputChange}
                           required
-                          rows={5}
-                          className="mt-1"
-                          placeholder="Please provide details about your inquiry..."
+                          rows={6}
+                          className="mt-2 rounded-[24px] border-[#eadfce] bg-[#fbf8f3] px-4 py-4"
+                          placeholder="Please share details about your enquiry, project, or support requirement..."
                         />
                       </div>
 
-                      <Button type="submit" className="w-full" size="lg">
+                      <Button type="submit" className="h-11 w-full rounded-full" size="lg" variant="primary">
                         <Send className="mr-2 h-4 w-4" />
-                        Send Message
+                        Send message
                       </Button>
                     </form>
                   )}
                 </CardContent>
               </Card>
-            </div>
 
-            {/* Contact Methods - Takes 1 column */}
-            <div className="lg:col-span-1">
-              <Card className="shadow-xl h-full">
-                <CardContent className="p-0">
-                  <div className="space-y-0">
-                    {contactMethods.map((method, index) => (
-                      <div
-                        key={index}
-                        className={`text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group p-8 ${
-                          index === 0 ? 'border-b border-muted' : ''
-                        }`}
-                      >
-                        <div className="mb-4 flex justify-center">
-                          <div className="p-4 bg-primary/10 rounded-full group-hover:bg-primary/20 transition-colors">
-                            <method.icon className="h-8 w-8 text-primary" />
+              <section className="space-y-5 sm:space-y-6">
+                <Card className="rounded-[26px] border-black/6 bg-[#2b2b2b] text-white shadow-[0_16px_60px_rgba(34,24,16,0.12)] sm:rounded-[34px]">
+                  <CardContent className="p-5 sm:p-8">
+                    <div className="text-[0.72rem] uppercase tracking-[0.24em] text-white/45">Direct Contact</div>
+                    <h2 className="mt-2 text-2xl font-semibold sm:text-3xl">Talk to the right team faster</h2>
+                    <div className="mt-6 space-y-4">
+                      {contactMethods.map((method) => (
+                        <div key={method.title} className="rounded-[20px] border border-white/10 bg-white/6 p-4 sm:rounded-[24px] sm:p-5">
+                          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/10">
+                            <method.icon className="h-5 w-5 text-[#f7b488]" />
                           </div>
+                          <h3 className="mt-4 text-lg font-semibold">{method.title}</h3>
+                          <p className="mt-2 text-sm leading-6 text-white/70">{method.description}</p>
+                          <div className="mt-4 text-base font-semibold">{method.contact}</div>
+                          <Badge className="mt-3 rounded-full border-0 bg-white/10 px-3 py-1 text-xs text-white/80">
+                            {method.hours}
+                          </Badge>
+                          <Button
+                            className="mt-5 h-11 w-full rounded-full border-white/15 bg-white/8 text-white hover:bg-white/14"
+                            variant="outline"
+                            onClick={() => {
+                              if (method.title === "Call Us") {
+                                window.open(`tel:${method.contact}`, "_self")
+                              } else {
+                                window.open(`mailto:${method.contact}`, "_self")
+                              }
+                            }}
+                          >
+                            {method.action}
+                          </Button>
                         </div>
-                        <h3 className="text-xl font-semibold mb-3">{method.title}</h3>
-                        <p className="text-muted-foreground text-base leading-relaxed mb-4">{method.description}</p>
-                        <div className="space-y-3 mb-6">
-                          <p className="font-semibold text-lg">{method.contact}</p>
-                          <Badge variant="secondary" className="text-sm px-3 py-1">{method.hours}</Badge>
-                        </div>
-                        <Button
-                          className="w-full"
-                          size="lg"
-                          onClick={() => {
-                            if (method.title === "Call Us") {
-                              window.open(`tel:${method.contact}`, '_self');
-                            } else {
-                              window.open(`mailto:${method.contact}`, '_self');
-                            }
-                          }}
-                        >
-                          {method.action}
-                        </Button>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="rounded-[26px] border-black/6 shadow-[0_16px_60px_rgba(34,24,16,0.06)] sm:rounded-[34px]">
+                  <CardContent className="p-5 sm:p-8">
+                    <div className="text-[0.72rem] uppercase tracking-[0.24em] text-[#8b6b52]">Main Office</div>
+                    <h3 className="mt-2 text-2xl font-semibold text-[#2b2b2b]">Coimbatore contact point</h3>
+                    <div className="mt-6 space-y-4 text-sm leading-7 text-[#6e6e6e]">
+                      <div className="flex items-start gap-3">
+                        <MapPin className="mt-1 h-4 w-4 flex-none text-[#f26a21]" />
+                        <span>No. 170, Mettupalayam Road, Coimbatore, Tamil Nadu 641043</span>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <Phone className="mt-1 h-4 w-4 flex-none text-[#f26a21]" />
+                        <span>+91 96290 15535</span>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <Mail className="mt-1 h-4 w-4 flex-none text-[#f26a21]" />
+                        <span>info@mrmplylam.com</span>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <Clock className="mt-1 h-4 w-4 flex-none text-[#f26a21]" />
+                        <span>Monday to Saturday, 9:00 AM to 6:00 PM</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </section>
+            </section>
+
+            <section className="rounded-[26px] border border-black/6 bg-[#fbf8f3] p-4 shadow-[0_16px_60px_rgba(34,24,16,0.05)] sm:rounded-[34px] sm:p-8">
+              <div className="mb-6 flex flex-col gap-4 lg:mb-8 lg:flex-row lg:items-end lg:justify-between">
+                <div>
+                  <div className="text-[0.72rem] uppercase tracking-[0.24em] text-[#8b6b52]">Store Network</div>
+                  <h2 className="mt-2 text-2xl font-semibold text-[#2b2b2b] sm:text-4xl">Visit a store near you</h2>
+                  <p className="mt-3 max-w-2xl text-sm leading-7 text-[#6e6e6e] sm:text-base">
+                    Explore our physical touchpoints for a more direct consultation and in-person material discovery.
+                  </p>
+                </div>
+                <Link to="/store-locator">
+                  <Button variant="outline" className="h-11 rounded-full bg-white">
+                    <MapPin className="h-4 w-4" />
+                    View all stores
+                  </Button>
+                </Link>
+              </div>
+
+              <div className="grid gap-4 sm:gap-5 md:grid-cols-2 xl:grid-cols-4">
+                {storeHighlights.map((store) => (
+                  <Link
+                    key={store.id}
+                    to="/store-locator"
+                    className="group overflow-hidden rounded-[24px] border border-black/6 bg-white shadow-[0_12px_40px_rgba(34,24,16,0.04)] sm:rounded-[28px]"
+                  >
+                    <div className="aspect-[4/3] overflow-hidden">
+                      <img
+                        src={store.image}
+                        alt={`${store.name} storefront`}
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    </div>
+                    <div className="p-4 sm:p-5">
+                      <div className="text-[0.66rem] uppercase tracking-[0.18em] text-[#8b6b52]">{store.city}</div>
+                      <div className="mt-2 text-base font-semibold text-[#2b2b2b] sm:text-lg">{store.name}</div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </section>
+
+            <section className="grid gap-5 sm:gap-6 lg:grid-cols-[0.92fr_1.08fr]">
+              <Card className="rounded-[26px] border-black/6 bg-[#2b2b2b] text-white shadow-[0_16px_60px_rgba(34,24,16,0.12)] sm:rounded-[34px]">
+                <CardContent className="p-5 sm:p-8">
+                  <div className="text-[0.72rem] uppercase tracking-[0.24em] text-white/45">Support Promise</div>
+                  <h2 className="mt-2 text-2xl font-semibold sm:text-3xl">Clear communication, practical assistance</h2>
+                  <div className="mt-6 grid gap-4">
+                    <div className="rounded-[20px] border border-white/10 bg-white/6 p-4 sm:rounded-[24px] sm:p-5">
+                      <Headphones className="h-5 w-5 text-[#f7b488]" />
+                      <div className="mt-3 text-lg font-semibold">Material guidance</div>
+                      <p className="mt-2 text-sm leading-6 text-white/70">
+                        Help with category selection, surface direction, and product-family navigation.
+                      </p>
+                    </div>
+                    <div className="rounded-[20px] border border-white/10 bg-white/6 p-4 sm:rounded-[24px] sm:p-5">
+                      <MessageSquare className="h-5 w-5 text-[#f7b488]" />
+                      <div className="mt-3 text-lg font-semibold">Project discussion</div>
+                      <p className="mt-2 text-sm leading-6 text-white/70">
+                        Reach out early if you need support around requirements, specifications, or coordination.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="rounded-[26px] border-black/6 shadow-[0_16px_60px_rgba(34,24,16,0.06)] sm:rounded-[34px]">
+                <CardContent className="p-5 sm:p-8">
+                  <div className="text-[0.72rem] uppercase tracking-[0.24em] text-[#8b6b52]">FAQ</div>
+                  <h2 className="mt-2 text-2xl font-semibold text-[#2b2b2b] sm:text-3xl">Common questions</h2>
+                  <div className="mt-6 grid gap-4 sm:mt-8 sm:grid-cols-2">
+                    {faqs.map((item) => (
+                      <div key={item.question} className="rounded-[20px] bg-[#fbf8f3] p-4 sm:rounded-[24px] sm:p-5">
+                        <div className="text-base font-semibold text-[#2b2b2b]">{item.question}</div>
+                        <p className="mt-2 text-sm leading-7 text-[#6e6e6e]">{item.answer}</p>
                       </div>
                     ))}
                   </div>
                 </CardContent>
               </Card>
-            </div>
+            </section>
           </div>
-        </div>
-      </section>
-
-      {/* Our Stores Grid Section */}
-      <section className="py-16">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">Our Stores</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
-              Visit our stores across multiple locations for personalized service and expert consultation
-            </p>
-            <Link to="/store-locator">
-              <Button size="lg" className="hover:scale-105 transition-transform duration-300">
-                <MapPin className="mr-2 h-5 w-5" />
-                View All Stores
-              </Button>
-            </Link>
-          </div>
-
-          {/* Store Grid - Mobile First */}
-          <div className="max-w-7xl mx-auto">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-              {[
-                { id: 1, name: "MRM PLY LAM LLP", image: "/modern-plywood-store-exterior-downtown.jpg", city: "Coimbatore" },
-                { id: 2, name: "MAHAVIR LAMINATES", image: "/large-plywood-showroom-midtown-storefront.jpg", city: "Coimbatore" },
-                { id: 3, name: "M CUBE SPACES LLP", image: "/industrial-plywood-warehouse-brooklyn-exterior.jpg", city: "Bengaluru" },
-                { id: 4, name: "MAHAVIR WOODS N VENEER", image: "/modern-wood-materials-store-queens-storefront.jpg", city: "Chennai" },
-                { id: 5, name: "R S Plywood", image: "/plywood-lumber-yard-staten-island-store.jpg", city: "Jodhpur" }
-              ].map((store) => (
-                <Link key={store.id} to="/store-locator">
-                  <Card className="group cursor-pointer hover:shadow-xl transition-all duration-300 hover:-translate-y-2 overflow-hidden h-80 flex flex-col">
-                    <div className="relative h-48 overflow-hidden flex-shrink-0">
-                      <img
-                        src={store.image}
-                        alt={`${store.name} storefront`}
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                      />
-                    </div>
-                    <CardContent className="p-4 text-center flex-grow flex flex-col justify-between">
-                      <div>
-                        <h3 className="font-semibold text-lg text-foreground mb-2">{store.name}</h3>
-                        <p className="text-muted-foreground mb-3">{store.city}</p>
-                      </div>
-                      <Button size="sm" className="w-full hover:scale-105 transition-transform duration-300 mt-auto">
-                        <MapPin className="mr-2 h-4 w-4" />
-                        Visit Store
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ Section */}
-      <section className="py-16 bg-gradient-to-r from-amber-50 to-orange-50">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">Frequently Asked Questions</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Quick answers to common questions. Can't find what you're looking for? Contact us directly.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <Card>
-              <CardContent className="p-6">
-                <h3 className="font-semibold mb-2">What are your response times?</h3>
-                <p className="text-sm text-muted-foreground">
-                  We respond to emails within 24 hours and phone calls are answered during business hours. Emergency
-                  support is available 24/7.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <h3 className="font-semibold mb-2">Do you offer technical support?</h3>
-                <p className="text-sm text-muted-foreground">
-                  Yes, we provide comprehensive technical support for all our products including installation,
-                  troubleshooting, and maintenance guidance.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <h3 className="font-semibold mb-2">Can I schedule a consultation?</h3>
-                <p className="text-sm text-muted-foreground">
-                  Contact us to schedule a free consultation with our experts to discuss your specific needs and
-                  requirements.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <h3 className="font-semibold mb-2">What information should I include?</h3>
-                <p className="text-sm text-muted-foreground">
-                  Please include your contact information, a detailed description of your inquiry, and any relevant
-                  product or order numbers.
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
+        </section>
       </main>
       <Footer />
     </div>

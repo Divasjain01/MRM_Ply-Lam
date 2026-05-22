@@ -1,49 +1,68 @@
-import type React from "react"
+import { Link } from "react-router-dom"
+import { ArrowUpRight } from "lucide-react"
 import type { Product } from "@/data/enhanced-products"
-import { Card, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { cn } from "@/lib/utils"
 
 interface ProductCardProps {
   product: Product
+  href: string
+  className?: string
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
-  const primaryImage =
-    product.productImages?.[0] ||
-    "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+const ProductCard = ({ product, href, className }: ProductCardProps) => {
+  const image =
+    product.image?.startsWith("/") ? product.image : product.image ? `/assets/${product.image}` : "/placeholder.svg"
 
   return (
-    <Card className="group overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
-      <div className="relative overflow-hidden">
+    <Link
+      to={href}
+      className={cn(
+        "group flex h-full flex-col overflow-hidden rounded-[28px] border border-black/6 bg-white shadow-[0_12px_40px_rgba(34,24,16,0.05)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(34,24,16,0.11)]",
+        className,
+      )}
+    >
+      <div className="relative aspect-[4/3] overflow-hidden bg-[#f7f2eb]">
         <img
-          src={primaryImage || "/placeholder.svg"}
+          src={image}
           alt={product.name}
-          className="w-full h-48 sm:h-56 object-cover group-hover:scale-110 transition-transform duration-500"
+          loading="lazy"
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
         />
+
         {product.warranty && (
-          <div className="absolute top-3 left-3">
-            <span className="bg-amber-600 text-white px-2 py-1 rounded-full text-xs font-semibold">
+          <div className="absolute left-4 top-4">
+            <Badge className="rounded-full border-0 bg-white/92 px-3 py-1 text-[0.68rem] uppercase tracking-[0.16em] text-[#2b2b2b] shadow-sm">
               {product.warranty}
-            </span>
+            </Badge>
           </div>
         )}
       </div>
-      <CardContent className="p-4">
-        <h3 className="text-lg font-bold text-gray-800 mb-2 line-clamp-2">{product.name}</h3>
-        {product.description && <p className="text-gray-600 text-sm mb-3 line-clamp-2">{product.description}</p>}
-        {product.tags && product.tags.length > 0 && (
-          <div className="flex gap-1 flex-wrap mb-3">
-            {product.tags.slice(0, 3).map((tag, index) => (
-              <span key={index} className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded">
-                {tag}
-              </span>
-            ))}
+
+      <div className="flex flex-1 flex-col p-4 sm:p-5">
+        <div className="text-[0.68rem] uppercase tracking-[0.18em] text-[#8b6b52]">Product Detail</div>
+        <h3 className="mt-2 text-lg font-semibold leading-tight text-[#2b2b2b] sm:text-xl">{product.name}</h3>
+        <p className="mt-3 line-clamp-3 text-sm leading-7 text-[#6e6e6e]">{product.description}</p>
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          {product.tags?.slice(0, 3).map((tag) => (
+            <Badge key={tag} variant="outline" className="rounded-full border-[#eadfce] bg-[#fbf8f3] px-3 py-1 text-[0.68rem] uppercase tracking-[0.12em] text-[#6a6257]">
+              {tag}
+            </Badge>
+          ))}
+        </div>
+
+        <div className="mt-5 flex items-center justify-between gap-3 border-t border-black/6 pt-4">
+          <div className="text-xs text-[#6e6e6e] sm:text-sm">
+            {product.thicknessOptions?.length ? `Available in ${product.thicknessOptions.length} thickness options` : "Explore specifications"}
           </div>
-        )}
-        <button className="text-amber-600 hover:text-amber-700 font-semibold text-sm transition-colors duration-200">
-          View Details →
-        </button>
-      </CardContent>
-    </Card>
+          <span className="inline-flex items-center gap-2 text-sm font-semibold text-[#f26a21]">
+            View details
+            <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+          </span>
+        </div>
+      </div>
+    </Link>
   )
 }
 

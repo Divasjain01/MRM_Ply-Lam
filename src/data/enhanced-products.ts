@@ -197,18 +197,18 @@ export const productsData: Record<ProductCategory, Product[]> = {
       },
     },
     {
-      name: "Stone Laminates",
-      description: "Realistic stone texture laminates for contemporary and modern interior designs.",
-      tags: ["Stone", "Modern", "Contemporary"],
+      name: "Marble and Stone Laminates",
+      description: "Mineral-inspired laminates that combine marble elegance and stone texture for contemporary interiors.",
+      tags: ["Marble", "Stone", "Contemporary"],
       thicknessOptions: [0.8, 1.0],
       productImages: [
         "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
       ],
       image: "4616_M2A2177.jpg",
-      features: ["Realistic Stone Texture", "Modern Design"],
-      specs: "Thickness: 0.8mm-1.0mm | Surface Texture: Stone Pattern",
+      features: ["Marble and Stone Visuals", "Modern Design"],
+      specs: "Thickness: 0.8mm-1.0mm | Surface Texture: Marble & Stone Pattern",
       specifications: {
-        "Surface Texture": "Stone Pattern",
+        "Surface Texture": "Marble & Stone Pattern",
         "Color Variation": "Natural Variations",
         Thickness: "0.8mm-1.0mm",
       },
@@ -227,6 +227,23 @@ export const productsData: Record<ProductCategory, Product[]> = {
       specifications: {
         "Surface Texture": "Solid Color",
         "Color Variation": "Multiple Colors Available",
+        Thickness: "0.8mm-1.0mm",
+      },
+    },
+    {
+      name: "Decorative Laminates",
+      description: "Expressive decorative laminates for statement furniture, feature panels, and design-led interiors.",
+      tags: ["Decorative", "Pattern", "Feature"],
+      thicknessOptions: [0.8, 1.0],
+      productImages: [
+        "/assets/render_20260316_152145_0.png",
+      ],
+      image: "render_20260316_152145_0.png",
+      features: ["Pattern-Led Surfaces", "Design Statement"],
+      specs: "Thickness: 0.8mm-1.0mm | Surface Texture: Decorative Pattern",
+      specifications: {
+        "Surface Texture": "Decorative Pattern",
+        "Color Variation": "Curated Design Range",
         Thickness: "0.8mm-1.0mm",
       },
     },

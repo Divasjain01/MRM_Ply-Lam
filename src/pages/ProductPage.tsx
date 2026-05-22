@@ -1,28 +1,27 @@
-import { useParams } from "react-router-dom"
+import { Link, useParams } from "react-router-dom"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import ProductDetailContent from "@/components/ProductDetailContent"
 import { productsData, type ProductCategory } from "@/data/enhanced-products"
 import { slugify } from "@/lib/products"
+import { categoryMeta } from "@/lib/site-content"
 
 const ProductPage = () => {
   const { slug, id: productSlug } = useParams<{ slug: string; id: string }>()
 
-  // Validate category
   if (!slug || !Object.keys(productsData).includes(slug)) {
     return (
       <div className="min-h-screen bg-white">
         <Header />
-        <div className="container mx-auto px-4 py-16 text-center">
-          <h1 className="text-4xl font-bold mb-4">Category Not Found</h1>
-          <p className="text-muted-foreground">The requested product category does not exist.</p>
+        <div className="mx-auto max-w-7xl px-4 py-20 text-center sm:px-6 lg:px-8">
+          <h1 className="text-4xl font-semibold text-[#2b2b2b]">Category not found</h1>
+          <p className="mt-4 text-[#6e6e6e]">The requested material family does not exist.</p>
         </div>
         <Footer />
       </div>
     )
   }
 
-  // Find product by slug
   const products = productsData[slug as ProductCategory]
   const product = products.find((p) => slugify(p.name) === productSlug)
 
@@ -30,43 +29,43 @@ const ProductPage = () => {
     return (
       <div className="min-h-screen bg-white">
         <Header />
-        <div className="container mx-auto px-4 py-16 text-center">
-          <h1 className="text-4xl font-bold mb-4">Product Not Found</h1>
-          <p className="text-muted-foreground">The requested product does not exist.</p>
+        <div className="mx-auto max-w-7xl px-4 py-20 text-center sm:px-6 lg:px-8">
+          <h1 className="text-4xl font-semibold text-[#2b2b2b]">Product not found</h1>
+          <p className="mt-4 text-[#6e6e6e]">The requested product does not exist in this category.</p>
         </div>
         <Footer />
       </div>
     )
   }
 
+  const meta = categoryMeta[slug as ProductCategory]
+
   return (
     <div className="min-h-screen bg-white">
       <Header />
 
-      {/* Breadcrumb */}
-      <section className="py-6 bg-gray-50 border-b">
-        <div className="max-w-7xl mx-auto px-6">
-          <nav className="flex items-center space-x-2 text-sm text-gray-600">
-            <a href="/" className="hover:text-amber-600 transition-colors">
+      <section className="border-b border-black/5 bg-[#fbf8f3]">
+        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+          <nav className="flex flex-wrap items-center gap-2 text-sm text-[#6e6e6e]">
+            <Link to="/" className="transition-colors hover:text-[#f26a21]">
               Home
-            </a>
+            </Link>
             <span>/</span>
-            <a href="/products" className="hover:text-amber-600 transition-colors">
+            <Link to="/products" className="transition-colors hover:text-[#f26a21]">
               Products
-            </a>
+            </Link>
             <span>/</span>
-            <a href={`/products/${slug}`} className="hover:text-amber-600 transition-colors">
-              {slug.charAt(0).toUpperCase() + slug.slice(1)}
-            </a>
+            <Link to={`/products/${slug}`} className="transition-colors hover:text-[#f26a21]">
+              {meta?.label || slug}
+            </Link>
             <span>/</span>
-            <span className="text-gray-800 font-medium">{product.name}</span>
+            <span className="font-medium text-[#2b2b2b]">{product.name}</span>
           </nav>
         </div>
       </section>
 
-      {/* Product Detail Content */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-6">
+      <section className="py-10 sm:py-14">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <ProductDetailContent product={product} category={slug} />
         </div>
       </section>

@@ -1,5 +1,5 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import { Suspense } from 'react'
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
+import { Suspense, useEffect } from 'react'
 import { AuthProvider } from '@/hooks/useAuth'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import LoadingSpinner from '@/components/LoadingSpinner'
@@ -18,11 +18,22 @@ import ProductPage from './pages/ProductPage'
 import StoreLocatorPage from './pages/StoreLocatorPage'
 import NotFoundPage from './pages/NotFoundPage'
 
+function ScrollToTop() {
+  const { pathname } = useLocation()
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
+  }, [pathname])
+
+  return null
+}
+
 function App() {
   return (
     <ErrorBoundary>
       <AuthProvider>
         <Router>
+          <ScrollToTop />
           <Suspense fallback={<LoadingSpinner size="lg" text="Loading..." className="min-h-screen" />}>
             <Routes>
               <Route path="/" element={<HomePage />} />
@@ -30,6 +41,7 @@ function App() {
               <Route path="/account" element={<AccountPage />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/download" element={<DownloadPage />} />
+              <Route path="/catalogs" element={<DownloadPage />} />
               <Route path="/index" element={<IndexPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/products" element={<ProductsPage />} />

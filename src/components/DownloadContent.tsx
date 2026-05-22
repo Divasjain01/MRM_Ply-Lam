@@ -1,128 +1,55 @@
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
+import { Download, FileText, FolderKanban, Lock, Shapes } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Download, FileText, ImageIcon, Video, Lock } from "lucide-react"
 import { useAuth } from "@/hooks/useAuth"
+import { catalogAssets, categoryMeta } from "@/lib/site-content"
 
-const downloadCategories = {
-  brochures: [
-    {
-      title: "MRM Plywood Complete Range",
-      description: "Comprehensive catalog of all plywood products with specifications",
-      fileSize: "12.5 MB",
-      format: "PDF",
-      icon: FileText,
-      url: "/brochures/mrm-plywood-complete-range.pdf"
-    },
-    {
-      title: "Ply and Boards & Laminates",
-      description: "Detailed information on ply and boards and decorative laminates",
-      fileSize: "8.2 MB",
-      format: "PDF",
-      icon: FileText,
-      url: "/brochures/ply-boards-laminates.pdf"
-    },
-    {
-      title: "Louvers & Veneers",
-      description: "Architectural louvers and natural wood veneers catalog",
-      fileSize: "6.8 MB",
-      format: "PDF",
-      icon: FileText,
-      url: "/brochures/louvers-veneers.pdf"
-    },
-  ],
-  technical: [
-    {
-      title: "Installation Guidelines",
-      description: "Step-by-step installation instructions for all products",
-      fileSize: "4.1 MB",
-      format: "PDF",
-      icon: FileText,
-      url: "/brochures/installation-guidelines.pdf"
-    },
-    {
-      title: "Technical Specifications",
-      description: "Detailed technical data sheets and certifications",
-      fileSize: "2.8 MB",
-      format: "PDF",
-      icon: FileText,
-      url: "/brochures/technical-specifications.pdf"
-    },
-    {
-      title: "Care & Maintenance Guide",
-      description: "Proper care instructions to maximize product lifespan",
-      fileSize: "1.9 MB",
-      format: "PDF",
-      icon: FileText,
-      url: "/brochures/care-maintenance.pdf"
-    },
-  ],
-  media: [
-    {
-      title: "Product Image Gallery",
-      description: "High-resolution product images for presentations",
-      fileSize: "45.2 MB",
-      format: "ZIP",
-      icon: ImageIcon,
-      url: "/brochures/product-images.zip"
-    },
-    {
-      title: "Installation Videos",
-      description: "Video tutorials for proper installation techniques",
-      fileSize: "128 MB",
-      format: "MP4",
-      icon: Video,
-      url: "/brochures/installation-videos.mp4"
-    },
-    {
-      title: "Company Profile Video",
-      description: "Corporate presentation and facility tour",
-      fileSize: "89 MB",
-      format: "MP4",
-      icon: Video,
-      url: "/brochures/company-profile.mp4"
-    },
-  ],
-}
+const categories = Object.values(categoryMeta)
 
 const DownloadContent = () => {
-  const [selectedCategory, setSelectedCategory] = useState<keyof typeof downloadCategories>("brochures")
+  const [selectedCategory, setSelectedCategory] = useState<(typeof categories)[number]["key"]>("plyandboards")
   const navigate = useNavigate()
   const { user } = useAuth()
 
-  const handleDownload = (url: string, fileName: string) => {
-    // Check if user is logged in
-    if (!user) {
-      // Redirect to login page
+  const assets = useMemo(
+    () => catalogAssets.filter((asset) => asset.category === selectedCategory),
+    [selectedCategory],
+  )
+
+  const handleDownload = (url: string, title: string, requiresAuth?: boolean) => {
+    if (requiresAuth && !user) {
       navigate("/login")
       return
     }
-    // In a real application, this would trigger the actual download
-    console.log(`Downloading: ${fileName}`)
-    // For now, just open the URL
-    window.open(url, '_blank')
+
+    console.log(`Downloading: ${title}`)
+    window.open(url, "_blank")
   }
 
   return (
-    <div className="space-y-12">
-      {/* Login Required Notice */}
+    <div className="space-y-8 sm:space-y-10">
       {!user && (
-        <Card className="bg-amber-50 border-amber-200">
-          <CardContent className="p-6 flex items-center justify-between flex-wrap gap-4">
-            <div className="flex items-center gap-3">
-              <Lock className="h-5 w-5 text-amber-600" />
+        <Card className="rounded-[24px] border-amber-200 bg-[#fff5ec] shadow-none sm:rounded-[28px]">
+          <CardContent className="flex flex-col gap-4 p-4 sm:p-6 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex items-start gap-3">
+              <Lock className="mt-1 h-5 w-5 text-[#f26a21]" />
               <div>
-                <h3 className="font-semibold text-amber-800">Login Required for Downloads</h3>
-                <p className="text-sm text-amber-700">Please login or register to access our product catalogues</p>
+                <h3 className="text-lg font-semibold text-[#2b2b2b]">Login unlocks protected catalog assets</h3>
+                <p className="mt-1 text-sm leading-6 text-[#6e6e6e]">
+                  Public brochures remain browseable, while technical sheets and deeper specification files can be kept
+                  behind dealer or customer login as the library grows.
+                </p>
               </div>
             </div>
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={() => navigate("/login")} className="bg-transparent border-amber-300 text-amber-800 hover:bg-amber-100">
+
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Button variant="outline" className="h-11 rounded-full bg-transparent" onClick={() => navigate("/login")}>
                 Login
               </Button>
-              <Button onClick={() => navigate("/login")} className="bg-amber-600 hover:bg-amber-700">
+              <Button variant="primary" className="h-11 rounded-full" onClick={() => navigate("/login")}>
                 Register
               </Button>
             </div>
@@ -130,71 +57,110 @@ const DownloadContent = () => {
         </Card>
       )}
 
-      <Card className="bg-muted/30">
-        <CardContent className="p-8">
-          <h2 className="text-2xl font-bold text-foreground mb-4">Download Center</h2>
-          <p className="text-muted-foreground mb-6">
-            Access our comprehensive product catalogs and technical resources. {user ? "Downloads are now available." : "Please login to download files."}
-          </p>
-        </CardContent>
-      </Card>
+      <section className="rounded-[26px] border border-black/6 bg-white p-4 shadow-[0_16px_60px_rgba(34,24,16,0.06)] sm:rounded-[34px] sm:p-8">
+        <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
+          <div>
+            <div className="text-[0.72rem] uppercase tracking-[0.24em] text-[#8b6b52]">Curated Library</div>
+            <h2 className="mt-2 text-2xl font-semibold text-[#2b2b2b] sm:text-4xl">Catalogs, brochures, and technical support files</h2>
+            <p className="mt-3 max-w-2xl text-sm leading-7 text-[#6e6e6e] sm:mt-4 sm:text-lg sm:leading-8">
+              Built as a premium catalogue library rather than a file dump, this section is organized by material family
+              and is ready for future PDFs, brochures, specification sets, and downloadable media.
+            </p>
+          </div>
 
-      {/* Download Categories */}
-      <Tabs
-        value={selectedCategory}
-        onValueChange={(value) => setSelectedCategory(value as keyof typeof downloadCategories)}
-      >
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="brochures">Product Brochures</TabsTrigger>
-          <TabsTrigger value="technical">Technical Docs</TabsTrigger>
-          <TabsTrigger value="media">Media Resources</TabsTrigger>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div className="rounded-[20px] bg-[#fbf8f3] p-4 sm:rounded-[24px]">
+              <FolderKanban className="h-5 w-5 text-[#f26a21]" />
+              <div className="mt-3 text-2xl font-semibold text-[#2b2b2b]">{catalogAssets.length}</div>
+              <div className="mt-1 text-sm text-[#6e6e6e]">Library assets</div>
+            </div>
+            <div className="rounded-[20px] bg-[#fbf8f3] p-4 sm:rounded-[24px]">
+              <Shapes className="h-5 w-5 text-[#f26a21]" />
+              <div className="mt-3 text-2xl font-semibold text-[#2b2b2b]">{categories.length}</div>
+              <div className="mt-1 text-sm text-[#6e6e6e]">Material families</div>
+            </div>
+            <div className="rounded-[20px] bg-[#fbf8f3] p-4 sm:rounded-[24px]">
+              <FileText className="h-5 w-5 text-[#f26a21]" />
+              <div className="mt-3 text-2xl font-semibold text-[#2b2b2b]">PDF ready</div>
+              <div className="mt-1 text-sm text-[#6e6e6e]">Scalable file structure</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <Tabs value={selectedCategory} onValueChange={(value) => setSelectedCategory(value as typeof selectedCategory)}>
+        <TabsList className="grid h-auto w-full grid-cols-2 gap-2 rounded-[24px] bg-transparent p-0 md:grid-cols-3 xl:grid-cols-5">
+          {categories.map((category) => (
+            <TabsTrigger
+              key={category.key}
+              value={category.key}
+              className="rounded-[18px] border border-black/6 bg-[#fbf8f3] px-3 py-3 text-xs leading-5 data-[state=active]:border-[#f26a21]/30 data-[state=active]:bg-[#fff4eb] data-[state=active]:text-[#2b2b2b] sm:rounded-[22px] sm:px-4 sm:text-sm"
+            >
+              {category.label}
+            </TabsTrigger>
+          ))}
         </TabsList>
 
-        {Object.entries(downloadCategories).map(([category, items]) => (
-          <TabsContent key={category} value={category} className="mt-8">
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {items.map((item, index) => (
-                <Card key={index} className="hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                  <CardContent className="p-6">
-                    <div className="flex items-start space-x-4">
-                      <div className="p-3 bg-primary/10 rounded-lg">
-                        <item.icon className="h-6 w-6 text-primary" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-foreground mb-2">{item.title}</h3>
-                        <p className="text-muted-foreground text-sm mb-4">{item.description}</p>
-                        <div className="flex items-center justify-between">
-                          <div className="text-xs text-muted-foreground">
-                            {item.format} • {item.fileSize}
-                          </div>
-                          <Button
-                            size="sm"
-                            onClick={() => handleDownload(item.url, item.title)}
-                            className=""
-                          >
-                            <Download className="h-4 w-4 mr-2" />
-                            Download
-                          </Button>
+        {categories.map((category) => (
+          <TabsContent key={category.key} value={category.key} className="mt-6 space-y-6 sm:mt-8 sm:space-y-8">
+            <section className="grid gap-5 sm:gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+              <div className="overflow-hidden rounded-[24px] border border-black/6 bg-[#2b2b2b] text-white sm:rounded-[30px]">
+                <img src={category.previewImage} alt={category.label} className="aspect-[16/10] w-full object-cover opacity-80" />
+                <div className="space-y-3 p-4 sm:p-6">
+                  <div className="text-[0.7rem] uppercase tracking-[0.24em] text-white/45">{category.eyebrow}</div>
+                  <h3 className="text-xl font-semibold sm:text-2xl">{category.label}</h3>
+                  <p className="text-sm leading-7 text-white/70">{category.description}</p>
+                </div>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                {assets.map((asset) => (
+                  <Card key={asset.id} className="rounded-[24px] border-black/6 shadow-[0_14px_50px_rgba(34,24,16,0.05)] sm:rounded-[28px]">
+                    <CardContent className="flex h-full flex-col p-4 sm:p-6">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="text-[0.66rem] uppercase tracking-[0.18em] text-[#8b6b52]">{asset.type}</div>
+                        <div className="rounded-full bg-[#fbf8f3] px-3 py-1 text-[11px] text-[#6e6e6e] sm:text-xs">
+                          {asset.format} · {asset.fileSize}
                         </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+
+                      <h4 className="mt-4 text-lg font-semibold text-[#2b2b2b] sm:text-xl">{asset.title}</h4>
+                      <p className="mt-3 flex-1 text-sm leading-7 text-[#6e6e6e]">{asset.description}</p>
+
+                      <div className="mt-5 flex flex-col gap-3 border-t border-black/6 pt-4 sm:mt-6 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="text-[11px] uppercase tracking-[0.16em] text-[#8b6b52] sm:text-xs">
+                          {asset.requiresAuth ? "Protected asset" : "Public asset"}
+                        </div>
+                        <Button
+                          variant={asset.requiresAuth ? "outline" : "primary"}
+                          className="h-11 rounded-full"
+                          onClick={() => handleDownload(asset.url, asset.title, asset.requiresAuth)}
+                        >
+                          <Download className="h-4 w-4" />
+                          Download
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </section>
           </TabsContent>
         ))}
       </Tabs>
 
-      {/* Additional Information */}
-      <Card className="bg-muted/30">
-        <CardContent className="p-8 text-center">
-          <h3 className="text-xl font-semibold text-foreground mb-4">Need Custom Information?</h3>
-          <p className="text-muted-foreground mb-6">
-            Looking for specific product data, custom specifications, or technical support? Our team is here to help.
-          </p>
-          <Button size="lg" variant="outline" className="bg-transparent">
-            Contact Technical Support
+      <Card className="rounded-[24px] border-black/6 bg-[#fbf8f3] shadow-none sm:rounded-[30px]">
+        <CardContent className="flex flex-col gap-4 p-4 sm:p-6 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <h3 className="text-xl font-semibold text-[#2b2b2b] sm:text-2xl">Need a collection-specific PDF later?</h3>
+            <p className="mt-2 text-sm leading-7 text-[#6e6e6e]">
+              The library is now structured so each product family or collection can carry its own catalogue, brochure,
+              technical sheet, and future specification file without changing the page design.
+            </p>
+          </div>
+
+          <Button variant="outline" className="h-11 rounded-full bg-white" onClick={() => navigate("/contact")}>
+            Contact technical support
           </Button>
         </CardContent>
       </Card>

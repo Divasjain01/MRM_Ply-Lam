@@ -1,136 +1,55 @@
-"use client"
-
 import type React from "react"
-import { useState } from "react"
+import { categoryMeta } from "@/lib/site-content"
 import type { ProductCategory } from "@/data/enhanced-products"
-import { Menu } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Link } from "react-router-dom"
+import { cn } from "@/lib/utils"
 
 interface ProductCategoryNavProps {
   activeCategory: ProductCategory
   onChange: (category: ProductCategory) => void
 }
 
-const categories: { key: ProductCategory; label: string; description: string; icon: string }[] = [
-  { key: "plyandboards", label: "Ply and Boards", description: "Premium plywood and blockboards", icon: "🏗️" },
-  { key: "laminateliners", label: "Laminate Liners", description: "Interior surface protection", icon: "🛡️" },
-  { key: "laminates", label: "Laminates", description: "Designer surface solutions", icon: "✨" },
-  { key: "louvers", label: "Louvers", description: "Architectural design elements", icon: "🏛️" },
-  { key: "veneers", label: "Veneers", description: "Natural wood finishes", icon: "🌳" },
-]
+const categories = Object.values(categoryMeta)
 
 const ProductCategoryNav: React.FC<ProductCategoryNavProps> = ({ activeCategory, onChange }) => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen)
-  }
-
   return (
-    <>
-      {/* Desktop Navigation */}
-      <section className="hidden md:block py-8 bg-white border-b border-gray-100">
-        <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
-          <div className="text-center mb-6">
-            <h2 className="text-lg font-bold text-gray-800 mb-3">Product Categories</h2>
-            <div className="w-20 h-1 bg-amber-600 mx-auto rounded-full"></div>
-          </div>
-          <div className="flex justify-between w-full gap-4">
-            {categories.map((category) => (
-              <Link
-                key={category.key}
-                to={`/products/${category.key}`}
-                className="flex-1"
-              >
-                <Button
-                  variant={activeCategory === category.key ? "default" : "outline"}
-                  size="lg"
-                  className={`w-full h-auto py-6 px-6 font-semibold transition-all duration-200 text-center text-base rounded-xl ${
-                    activeCategory === category.key
-                      ? "bg-amber-600 text-white shadow-lg border-amber-600"
-                      : "hover:bg-amber-50 hover:border-amber-200 text-gray-700 border-gray-200"
-                  }`}
-                  aria-label={`View ${category.label} products`}
-                >
-                  <span className="font-semibold whitespace-nowrap">{category.label}</span>
-                </Button>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
+    <section className="rounded-[28px] border border-black/6 bg-white p-4 shadow-[0_16px_60px_rgba(34,24,16,0.06)] sm:rounded-[32px] sm:p-5">
+      <div className="mb-5 flex flex-col gap-2 px-2">
+        <div className="text-[0.7rem] uppercase tracking-[0.24em] text-[#8b6b52]">Browse Families</div>
+        <h2 className="text-2xl font-semibold text-[#2b2b2b]">Product categories</h2>
+        <p className="text-sm leading-6 text-[#6e6e6e] sm:hidden">Swipe horizontally to explore each product family.</p>
+      </div>
 
-      {/* Mobile Menu Overlay */}
-      {isMobileMenuOpen && (
-        <div className="fixed inset-0 bg-black/50 z-40" onClick={toggleMobileMenu} />
-      )}
+      <div className="mobile-slider scrollbar-hidden -mx-1 flex snap-x snap-mandatory gap-3 overflow-x-auto px-1 pb-2 sm:mx-0 sm:grid sm:gap-3 sm:overflow-visible sm:px-0 sm:pb-0 sm:snap-none sm:grid-cols-2 xl:grid-cols-5">
+        {categories.map((category) => {
+          const active = activeCategory === category.key
 
-      {/* Mobile Slide-out Menu */}
-      <div className={`fixed bottom-20 left-4 right-4 sm:left-6 sm:right-6 bg-white rounded-2xl shadow-2xl z-50 transition-all duration-300 transform ${
-        isMobileMenuOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0 pointer-events-none'
-      } max-h-[32rem] overflow-hidden`}>
-        <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-amber-50 to-orange-50">
-          <h3 className="font-bold text-gray-800 text-center text-lg">Product Categories</h3>
-          <div className="w-16 h-1 bg-amber-600 mx-auto mt-3 rounded-full"></div>
-        </div>
-
-        <div className="max-h-80 overflow-y-auto">
-          {categories.map((category, index) => (
-            <Link
+          return (
+            <button
               key={category.key}
-              to={`/products/${category.key}`}
-              className="block"
+              type="button"
+              onClick={() => onChange(category.key)}
+              className={cn(
+                "group relative w-[82vw] max-w-[320px] flex-none snap-start overflow-hidden rounded-[22px] border p-3.5 text-left transition-all duration-300 sm:w-auto sm:max-w-none sm:flex-initial sm:rounded-[24px] sm:p-4",
+                active
+                  ? "border-[#f26a21]/35 bg-[#fff6ef] shadow-[0_12px_36px_rgba(242,106,33,0.12)]"
+                  : "border-black/6 bg-[#fbf8f3] hover:-translate-y-0.5 hover:border-[#eadfce] hover:bg-white",
+              )}
             >
-              <Button
-                variant={activeCategory === category.key ? "primary" : "ghost"}
-                className={`w-full py-6 px-6 h-auto text-left transition-all duration-200 flex items-center justify-between ${
-                  activeCategory === category.key
-                    ? "bg-amber-600 text-white shadow-lg"
-                    : "hover:bg-amber-50 text-gray-700"
-                } ${index === 0 ? 'rounded-t-2xl' : ''} ${index === categories.length - 1 ? 'rounded-b-2xl' : ''}`}
-                aria-label={`View ${category.label} products`}
-              >
-                <div className="flex-1 min-w-0">
-                  <div className="font-bold text-lg mb-2 truncate">{category.label}</div>
-                  <div className="text-base leading-tight opacity-80">
-                    {category.description}
-                  </div>
-                </div>
-
-                {activeCategory === category.key && (
-                  <div className="w-4 h-12 bg-white rounded-full flex-shrink-0" />
-                )}
-              </Button>
-            </Link>
-          ))}
-        </div>
-      </div>
-
-      {/* Mobile Header */}
-      <div className="md:hidden bg-white border-b border-gray-100">
-        <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 flex items-center justify-between w-full">
-          <div className="flex items-center space-x-4 min-w-0 flex-1">
-            <div className="min-w-0 flex-1">
-              <div className="font-bold text-gray-800 text-base truncate">Product Categories</div>
-              <div className="text-base text-amber-600 font-semibold truncate">
-                {categories.find(cat => cat.key === activeCategory)?.label}
+              <div className="mb-4 aspect-[4/3] overflow-hidden rounded-[18px]">
+                <img
+                  src={category.previewImage}
+                  alt={category.label}
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
               </div>
-            </div>
-          </div>
-
-          <Button
-            onClick={toggleMobileMenu}
-            variant="ghost"
-            size="icon"
-            className="p-3 flex-shrink-0 hover:bg-amber-50"
-            aria-label="Open navigation menu"
-          >
-            <Menu className="w-6 h-6" />
-          </Button>
-        </div>
+              <div className="text-[0.66rem] uppercase tracking-[0.18em] text-[#8b6b52]">{category.eyebrow}</div>
+              <div className="mt-2 text-base font-semibold text-[#2b2b2b]">{category.label}</div>
+              <p className="mt-2 text-sm leading-6 text-[#6e6e6e]">{category.shortDescription}</p>
+            </button>
+          )
+        })}
       </div>
-    </>
+    </section>
   )
 }
 

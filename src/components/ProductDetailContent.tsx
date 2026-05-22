@@ -1,12 +1,15 @@
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { Link } from "react-router-dom"
-import { Card, CardContent } from "@/components/ui/card"
+import { ArrowRight, Download, FileText, MessageSquare } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import ProductImageSliderEnhanced from "@/components/ui/ProductImageSliderEnhanced"
 import SpecificationTable from "@/components/SpecificationTable"
 import type { Product } from "@/data/enhanced-products"
+import { categoryMeta, getCategoryCatalogAssets, getCategoryCollections, getCollectionProducts } from "@/lib/site-content"
+import { slugify } from "@/lib/products"
 
 interface ProductDetailContentProps {
   product: Product
@@ -16,105 +19,128 @@ interface ProductDetailContentProps {
 const ProductDetailContent = ({ product, category }: ProductDetailContentProps) => {
   const [selectedThickness, setSelectedThickness] = useState<number | null>(product.thicknessOptions?.[0] || null)
 
-  return (
-    <div className="space-y-12">
-      {/* Product Header */}
-      <div className="grid lg:grid-cols-2 gap-12">
-        {/* Image Slider */}
-        <div className="space-y-4">
-          <ProductImageSliderEnhanced images={product.productImages || []} productName={product.name} />
-        </div>
+  const activeMeta = categoryMeta[category as keyof typeof categoryMeta]
+  const categoryAssets = getCategoryCatalogAssets(category as keyof typeof categoryMeta)
+  const relatedProducts = useMemo(() => {
+    const collections = getCategoryCollections(category as keyof typeof categoryMeta)
+    const collection = collections.find((item) => item.productNames.includes(product.name))
+    if (!collection) return []
+    return getCollectionProducts(collection).filter((item) => item.name !== product.name).slice(0, 3)
+  }, [category, product.name])
 
-        {/* Product Info */}
-        <div className="space-y-6">
-          <div>
-            <h1 className="text-4xl font-bold text-gray-800 mb-4">{product.name}</h1>
-            <p className="text-xl text-gray-600 leading-relaxed">{product.description}</p>
+  return (
+    <div className="space-y-8 sm:space-y-10">
+      <section className="overflow-hidden rounded-[26px] border border-black/6 bg-white shadow-[0_20px_70px_rgba(34,24,16,0.07)] sm:rounded-[34px]">
+        <div className="grid gap-0 lg:grid-cols-[1.05fr_0.95fr]">
+          <div className="border-b border-black/6 bg-[#fbf8f3] p-4 sm:p-6 lg:border-b-0 lg:border-r lg:p-8">
+            <ProductImageSliderEnhanced images={product.productImages || []} productName={product.name} />
           </div>
 
-          {product.warranty && (
-            <Badge variant="secondary" className="text-lg px-4 py-2 bg-amber-100 text-amber-800">
-              {product.warranty}
-            </Badge>
-          )}
+          <div className="space-y-6 p-4 sm:space-y-8 sm:p-8 lg:p-10">
+            <div className="space-y-3 sm:space-y-4">
+              <div className="text-[0.72rem] uppercase tracking-[0.24em] text-[#8b6b52]">{activeMeta?.eyebrow || "Product Detail"}</div>
+              <h1 className="text-2xl font-semibold tracking-tight text-[#2b2b2b] sm:text-4xl">{product.name}</h1>
+              <p className="max-w-2xl text-sm leading-7 text-[#6e6e6e] sm:text-lg sm:leading-8">{product.description}</p>
+            </div>
 
-          {product.tags && (
             <div className="flex flex-wrap gap-2">
-              {product.tags.map((tag, index) => (
-                <Badge key={index} variant="outline">
+              {product.warranty && (
+                <Badge className="rounded-full border-0 bg-[#fff1e8] px-4 py-2 text-sm font-medium text-[#f26a21]">
+                  {product.warranty}
+                </Badge>
+              )}
+              {product.tags?.map((tag) => (
+                <Badge key={tag} variant="outline" className="rounded-full border-[#eadfce] bg-[#fbf8f3] px-3 py-1 text-xs uppercase tracking-[0.12em] text-[#6a6257]">
                   {tag}
                 </Badge>
               ))}
             </div>
-          )}
 
-          {/* Thickness Options */}
-          {product.thicknessOptions && (
-            <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-3">Available Thickness (mm)</h3>
-              <div className="flex flex-wrap gap-2">
-                {product.thicknessOptions.map((thickness) => (
-                  <Button
-                    key={thickness}
-                    variant={selectedThickness === thickness ? "default" : "outline"}
-                    onClick={() => setSelectedThickness(thickness)}
-                    className="min-w-[60px]"
-                  >
-                    {thickness}mm
-                  </Button>
-                ))}
+            {product.thicknessOptions && (
+              <div className="rounded-[20px] border border-black/6 bg-[#fbf8f3] p-4 sm:rounded-[24px] sm:p-5">
+                <div className="mb-3 text-sm font-semibold uppercase tracking-[0.16em] text-[#8b6b52]">Available thickness</div>
+                <div className="flex flex-wrap gap-2">
+                  {product.thicknessOptions.map((thickness) => (
+                    <Button
+                      key={thickness}
+                      variant={selectedThickness === thickness ? "primary" : "outline"}
+                      onClick={() => setSelectedThickness(thickness)}
+                      className="rounded-full"
+                    >
+                      {thickness} mm
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="grid gap-3 sm:grid-cols-3 sm:gap-4">
+              <div className="rounded-[20px] border border-black/6 bg-white p-4 sm:rounded-[24px]">
+                <div className="text-[0.66rem] uppercase tracking-[0.18em] text-[#8b6b52]">Category</div>
+                <div className="mt-2 text-lg font-semibold text-[#2b2b2b]">{activeMeta?.label || "Products"}</div>
+              </div>
+              <div className="rounded-[20px] border border-black/6 bg-white p-4 sm:rounded-[24px]">
+                <div className="text-[0.66rem] uppercase tracking-[0.18em] text-[#8b6b52]">Documentation</div>
+                <div className="mt-2 text-lg font-semibold text-[#2b2b2b]">{categoryAssets.length} assets</div>
+              </div>
+              <div className="rounded-[20px] border border-black/6 bg-white p-4 sm:rounded-[24px]">
+                <div className="text-[0.66rem] uppercase tracking-[0.18em] text-[#8b6b52]">Use Case</div>
+                <div className="mt-2 text-lg font-semibold text-[#2b2b2b]">Material-led interiors</div>
               </div>
             </div>
-          )}
 
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Link to="/contact">
-              <Button size="lg" className="bg-amber-600 hover:bg-amber-700 w-full sm:w-auto">
-                Request Quote
-              </Button>
-            </Link>
-            <Link to="/download">
-              <Button size="lg" variant="outline" className="w-full sm:w-auto">
-                Download Brochure
-              </Button>
-            </Link>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Link to="/contact" className="flex-1">
+                <Button size="lg" variant="primary" className="w-full rounded-full">
+                  <MessageSquare className="h-4 w-4" />
+                  Request quote
+                </Button>
+              </Link>
+              <Link to="/catalogs" className="flex-1">
+                <Button size="lg" variant="outline" className="w-full rounded-full bg-transparent">
+                  <Download className="h-4 w-4" />
+                  Download catalogue
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Product Details Tabs */}
       <Tabs defaultValue="specifications" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="specifications">Specifications</TabsTrigger>
-          <TabsTrigger value="applications">Applications</TabsTrigger>
-          <TabsTrigger value="installation">Installation</TabsTrigger>
+        <TabsList className="grid h-auto w-full grid-cols-3 rounded-[22px] bg-[#fbf8f3] p-1 sm:rounded-full">
+          <TabsTrigger value="specifications" className="rounded-[18px] px-2 py-2 text-[11px] sm:rounded-full sm:text-sm">
+            Specifications
+          </TabsTrigger>
+          <TabsTrigger value="applications" className="rounded-[18px] px-2 py-2 text-[11px] sm:rounded-full sm:text-sm">
+            Applications
+          </TabsTrigger>
+          <TabsTrigger value="installation" className="rounded-[18px] px-2 py-2 text-[11px] sm:rounded-full sm:text-sm">
+            Installation
+          </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="specifications" className="mt-8">
-          <Card>
-            <CardContent className="p-6">
+        <TabsContent value="specifications" className="mt-6">
+          <Card className="rounded-[24px] border-black/6 shadow-[0_12px_50px_rgba(34,24,16,0.05)] sm:rounded-[30px]">
+            <CardContent className="p-4 sm:p-8">
               {product.specifications ? (
                 <SpecificationTable specifications={product.specifications} />
               ) : (
-                <p className="text-gray-600">Detailed specifications available on request.</p>
+                <p className="text-[#6e6e6e]">Detailed specifications will be available in the product catalogue.</p>
               )}
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="applications" className="mt-8">
-          <Card>
-            <CardContent className="p-6">
-              <h3 className="text-xl font-semibold mb-4">Recommended Applications</h3>
-              <div className="grid md:grid-cols-2 gap-6">
-                {getApplications(category).map((app, index) => (
-                  <div key={index} className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-amber-600 rounded-full mt-2 flex-shrink-0"></div>
-                    <div>
-                      <h4 className="font-semibold text-gray-800">{app.title}</h4>
-                      <p className="text-gray-600 text-sm">{app.description}</p>
-                    </div>
+        <TabsContent value="applications" className="mt-6">
+          <Card className="rounded-[24px] border-black/6 shadow-[0_12px_50px_rgba(34,24,16,0.05)] sm:rounded-[30px]">
+            <CardContent className="p-4 sm:p-8">
+              <h3 className="text-lg font-semibold text-[#2b2b2b] sm:text-xl">Recommended applications</h3>
+              <div className="mt-5 grid gap-3 sm:mt-6 sm:gap-4 md:grid-cols-2">
+                {getApplications(category).map((app) => (
+                  <div key={app.title} className="rounded-[18px] border border-black/6 bg-[#fbf8f3] p-4 sm:rounded-[22px] sm:p-5">
+                    <div className="text-base font-semibold text-[#2b2b2b]">{app.title}</div>
+                    <p className="mt-2 text-sm leading-7 text-[#6e6e6e]">{app.description}</p>
                   </div>
                 ))}
               </div>
@@ -122,19 +148,19 @@ const ProductDetailContent = ({ product, category }: ProductDetailContentProps) 
           </Card>
         </TabsContent>
 
-        <TabsContent value="installation" className="mt-8">
-          <Card>
-            <CardContent className="p-6">
-              <h3 className="text-xl font-semibold mb-4">Installation Guidelines</h3>
-              <div className="space-y-4">
+        <TabsContent value="installation" className="mt-6">
+          <Card className="rounded-[24px] border-black/6 shadow-[0_12px_50px_rgba(34,24,16,0.05)] sm:rounded-[30px]">
+            <CardContent className="p-4 sm:p-8">
+              <h3 className="text-lg font-semibold text-[#2b2b2b] sm:text-xl">Installation guidance</h3>
+              <div className="mt-5 grid gap-3 sm:mt-6 sm:gap-4">
                 {getInstallationSteps(category).map((step, index) => (
-                  <div key={index} className="flex items-start space-x-4">
-                    <div className="w-8 h-8 bg-amber-600 text-white rounded-full flex items-center justify-center font-semibold text-sm flex-shrink-0">
+                  <div key={step.title} className="flex gap-3 rounded-[20px] border border-black/6 bg-[#fbf8f3] p-4 sm:gap-4 sm:rounded-[24px] sm:p-5">
+                    <div className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-[#f26a21] text-sm font-semibold text-white">
                       {index + 1}
                     </div>
                     <div>
-                      <h4 className="font-semibold text-gray-800 mb-1">{step.title}</h4>
-                      <p className="text-gray-600">{step.description}</p>
+                      <div className="text-base font-semibold text-[#2b2b2b]">{step.title}</div>
+                      <p className="mt-1 text-sm leading-7 text-[#6e6e6e]">{step.description}</p>
                     </div>
                   </div>
                 ))}
@@ -143,6 +169,51 @@ const ProductDetailContent = ({ product, category }: ProductDetailContentProps) 
           </Card>
         </TabsContent>
       </Tabs>
+
+      <section className="grid gap-5 sm:gap-6 lg:grid-cols-[1fr_0.9fr]">
+        <div className="rounded-[24px] border border-black/6 bg-[#2b2b2b] p-4 text-white shadow-[0_16px_60px_rgba(34,24,16,0.12)] sm:rounded-[30px] sm:p-8">
+          <div className="text-[0.72rem] uppercase tracking-[0.24em] text-white/46">Catalog Support</div>
+          <h3 className="mt-2 text-xl font-semibold sm:text-2xl">Related documentation</h3>
+          <div className="mt-5 space-y-3 sm:mt-6 sm:space-y-4">
+            {categoryAssets.slice(0, 3).map((asset) => (
+              <div key={asset.id} className="rounded-[18px] border border-white/10 bg-white/6 p-4 sm:rounded-[22px]">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="text-base font-semibold">{asset.title}</div>
+                  <FileText className="h-4 w-4 text-[#f26a21]" />
+                </div>
+                <p className="mt-2 text-sm leading-6 text-white/68">{asset.description}</p>
+              </div>
+            ))}
+          </div>
+          <Link to="/catalogs" className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-[#f7b488] hover:text-white">
+            Open catalog library
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+
+        <div className="rounded-[24px] border border-black/6 bg-white p-4 shadow-[0_16px_60px_rgba(34,24,16,0.06)] sm:rounded-[30px] sm:p-8">
+          <div className="text-[0.72rem] uppercase tracking-[0.24em] text-[#8b6b52]">Related Products</div>
+          <h3 className="mt-2 text-xl font-semibold text-[#2b2b2b] sm:text-2xl">Continue browsing</h3>
+          <div className="mt-5 space-y-3 sm:mt-6">
+            {relatedProducts.length > 0 ? (
+              relatedProducts.map((item) => (
+                <Link
+                  key={item.name}
+                  to={`/products/${category}/${slugify(item.name)}`}
+                  className="flex items-center justify-between rounded-[18px] bg-[#fbf8f3] px-4 py-4 text-sm text-[#2b2b2b] sm:rounded-[22px]"
+                >
+                  <span>{item.name}</span>
+                  <ArrowRight className="h-4 w-4 text-[#f26a21]" />
+                </Link>
+              ))
+            ) : (
+              <p className="text-sm leading-7 text-[#6e6e6e]">
+                This product family is ready to support richer related-product journeys as the catalogue expands.
+              </p>
+            )}
+          </div>
+        </div>
+      </section>
     </div>
   )
 }
@@ -150,84 +221,67 @@ const ProductDetailContent = ({ product, category }: ProductDetailContentProps) 
 function getApplications(category: string) {
   const applications = {
     plyandboards: [
-      { title: "Furniture Manufacturing", description: "Cabinets, wardrobes, and custom furniture" },
-      { title: "Interior Paneling", description: "Wall panels and decorative applications" },
-      { title: "Flooring", description: "Subflooring and engineered flooring systems" },
-      { title: "Construction", description: "Structural applications and formwork" },
-      { title: "Furniture Core", description: "Table tops, shelving, and cabinet construction" },
-      { title: "Partitions", description: "Room dividers and office partitions" },
-      { title: "Doors", description: "Interior door cores and panels" },
-      { title: "Shelving", description: "Heavy-duty shelving systems" },
+      { title: "Cabinetry & wardrobes", description: "Reliable board performance for kitchens, bedrooms, and storage systems." },
+      { title: "Furniture manufacturing", description: "Suitable for tables, partitions, shelving, and custom furniture work." },
+      { title: "Interior fit-outs", description: "Works across commercial joinery, wall build-ups, and modular fabrication." },
+      { title: "Door shutters", description: "Stable core structures for durable residential and hospitality door applications." },
     ],
     laminateliners: [
-      { title: "Wardrobe Interiors", description: "Inner sides of wardrobes for neat finish" },
-      { title: "Cabinet Linings", description: "Cabinet interiors and drawer bases" },
-      { title: "Drawer Construction", description: "Drawer sides and bottom panels" },
-      { title: "Furniture Protection", description: "Surface protection for furniture interiors" },
+      { title: "Wardrobe interiors", description: "A practical finish for cabinet internals with a neat, consistent appearance." },
+      { title: "Drawer systems", description: "Protective liner sheets suited to high-touch storage components." },
+      { title: "Cabinet lining", description: "Useful wherever smooth, easy-to-maintain interior surfacing is required." },
     ],
     laminates: [
-      { title: "Kitchen Cabinets", description: "Durable and easy-to-clean surfaces" },
-      { title: "Furniture Surfaces", description: "Tables, desks, and storage units" },
-      { title: "Wall Cladding", description: "Decorative wall applications" },
-      { title: "Commercial Spaces", description: "Retail and office interiors" },
+      { title: "Kitchen shutters", description: "Design-led exterior surfaces with easy maintenance and wide style flexibility." },
+      { title: "Furniture surfacing", description: "A clean material palette for wardrobes, tables, entertainment units, and desks." },
+      { title: "Feature paneling", description: "Decorative wall and vertical cladding surfaces for visual depth." },
+      { title: "Commercial interiors", description: "Suitable for retail, hospitality, and office furniture systems." },
     ],
     louvers: [
-      { title: "Feature Walls", description: "Accent walls and design elements" },
-      { title: "Ceiling Design", description: "Suspended and integrated ceiling systems" },
-      { title: "Ventilation", description: "Functional ventilation solutions" },
-      { title: "Privacy Screens", description: "Decorative room dividers" },
+      { title: "Feature walls", description: "Adds rhythm and architectural depth to focal surfaces." },
+      { title: "Ceiling compositions", description: "Useful in hospitality and premium residential ceiling designs." },
+      { title: "Partitions", description: "A refined way to zone space while preserving openness and visual continuity." },
     ],
     veneers: [
-      { title: "Luxury Furniture", description: "High-end furniture finishing" },
-      { title: "Architectural Millwork", description: "Custom millwork and trim" },
-      { title: "Interior Design", description: "Wall panels and decorative elements" },
-      { title: "Restoration", description: "Antique and heritage furniture restoration" },
+      { title: "Luxury joinery", description: "A natural timber finish for wardrobes, paneling, and furniture faces." },
+      { title: "Feature surfaces", description: "Warm veneer grain suited to statement walls and curated interior moments." },
+      { title: "Hospitality detailing", description: "A premium natural material layer for boutique and upscale commercial projects." },
     ],
   }
+
   return applications[category as keyof typeof applications] || []
 }
 
 function getInstallationSteps(category: string) {
   const steps = {
     plyandboards: [
-      { title: "Surface Preparation", description: "Ensure the substrate is clean, dry, and level" },
-      { title: "Acclimatization", description: "Allow plywood to acclimatize to room conditions for 24-48 hours" },
-      { title: "Cutting", description: "Use appropriate tools with fine-tooth blades to prevent chipping" },
-      { title: "Installation", description: "Secure with appropriate fasteners, maintaining proper spacing" },
-      { title: "Finishing", description: "Apply primer and finish as per manufacturer recommendations" },
-      { title: "Planning", description: "Plan the layout and measure accurately before cutting" },
-      { title: "Edge Treatment", description: "Apply edge banding or trim to exposed edges" },
-      { title: "Assembly", description: "Use appropriate adhesives and mechanical fasteners" },
+      { title: "Condition the boards", description: "Allow panels to acclimatize to site conditions before fabrication or installation." },
+      { title: "Plan the cutting layout", description: "Organize cuts, grain direction, and edge exposure before machining begins." },
+      { title: "Use precise tooling", description: "Fine-tooth blades and calibrated setups reduce chip-out and improve finish quality." },
+      { title: "Seal and finish exposed edges", description: "Complete edge treatment and final protection according to project requirements." },
     ],
     laminateliners: [
-      { title: "Surface Preparation", description: "Ensure substrate surface is clean and smooth" },
-      { title: "Measurement", description: "Measure and cut laminate liner to required size" },
-      { title: "Adhesive Application", description: "Apply appropriate adhesive to substrate surface" },
-      { title: "Positioning", description: "Carefully position liner and press firmly" },
-      { title: "Trimming", description: "Trim excess material and ensure proper fit" },
+      { title: "Prepare the substrate", description: "Ensure the internal cabinet surface is clean, dry, and smooth." },
+      { title: "Measure accurately", description: "Cut liners precisely to the panel size before adhesive application." },
+      { title: "Apply with even pressure", description: "Position carefully and press uniformly for a clean bonded finish." },
     ],
     laminates: [
-      { title: "Surface Preparation", description: "Ensure substrate is smooth, clean, and dry" },
-      { title: "Adhesive Application", description: "Apply contact adhesive evenly to both surfaces" },
-      { title: "Positioning", description: "Carefully position laminate - contact adhesive bonds immediately" },
-      { title: "Pressing", description: "Apply even pressure using a roller or press" },
-      { title: "Trimming", description: "Trim excess material with a router or sharp knife" },
+      { title: "Prepare the base panel", description: "Use a clean, level substrate ready for lamination." },
+      { title: "Apply adhesive evenly", description: "Maintain a consistent adhesive spread and follow curing guidelines." },
+      { title: "Press and trim", description: "Use even pressure, then finish edges carefully for a premium result." },
     ],
     louvers: [
-      { title: "Layout Planning", description: "Plan the louver arrangement and spacing" },
-      { title: "Framework", description: "Install supporting framework if required" },
-      { title: "Mounting", description: "Secure louvers to framework or wall structure" },
-      { title: "Alignment", description: "Ensure proper alignment and spacing between louvers" },
-      { title: "Finishing", description: "Apply protective finish if needed" },
+      { title: "Set the spacing logic", description: "Define rhythm, layout, and intersection points before fixing any element." },
+      { title: "Build the sub-frame", description: "Ensure the support structure is true, aligned, and appropriate for the installation." },
+      { title: "Install and align", description: "Fix louvers carefully while checking spacing and continuity through the full run." },
     ],
     veneers: [
-      { title: "Substrate Preparation", description: "Prepare smooth, stable substrate surface" },
-      { title: "Veneer Selection", description: "Match grain patterns and color consistency" },
-      { title: "Adhesive Application", description: "Apply appropriate veneer adhesive evenly" },
-      { title: "Pressing", description: "Use veneer press or vacuum bag for proper bonding" },
-      { title: "Sanding & Finishing", description: "Sand carefully and apply protective finish" },
+      { title: "Prepare the backing", description: "A smooth, stable substrate is essential for a consistent veneer finish." },
+      { title: "Match grain direction", description: "Plan veneer sequencing to maintain a coherent visual pattern." },
+      { title: "Press and finish", description: "Bond evenly, sand carefully, and protect the natural face with the right top coat." },
     ],
   }
+
   return steps[category as keyof typeof steps] || []
 }
 

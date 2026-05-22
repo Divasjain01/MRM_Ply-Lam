@@ -54,6 +54,9 @@
   --sidebar-accent-foreground: oklch(0.2 0 0);
   --sidebar-border: oklch(0.9 0 0);
   --sidebar-ring: oklch(0.2 0 0);
+  --page-ivory: #fbf8f3;
+  --page-wash: #f7f1e7;
+  --page-ink: #2b2b2b;
 }
 
 .dark {
@@ -139,18 +142,24 @@
   }
   body {
     @apply bg-background text-foreground font-sans antialiased;
-    /* Improve text rendering on mobile */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    /* Prevent horizontal scroll on mobile */
     overflow-x: hidden;
+    background-image: linear-gradient(to bottom, rgba(251, 248, 243, 0.16), rgba(255, 255, 255, 0));
   }
-  /* Mobile-first improvements */
   html {
-    /* Better scrolling on mobile */
     -webkit-overflow-scrolling: touch;
-    /* Prevent zoom on input focus on iOS */
     -webkit-text-size-adjust: 100%;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    letter-spacing: -0.03em;
+  }
+  ::selection {
+    background: rgba(242, 106, 33, 0.16);
+    color: #2b2b2b;
   }
 }
 
@@ -259,10 +268,29 @@
   .container-padding {
     @apply px-4 sm:px-6 lg:px-8;
   }
+  .editorial-shell {
+    @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+  .panel-soft {
+    background: linear-gradient(180deg, rgba(255,255,255,0.88), rgba(251,248,243,0.9));
+  }
 
   /* Focus-visible improvements for accessibility */
   .focus-ring {
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+  }
+
+  .scrollbar-hidden {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hidden::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mobile-slider {
+    -webkit-overflow-scrolling: touch;
   }
 }
 
