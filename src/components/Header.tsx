@@ -30,13 +30,11 @@ const Header = () => {
     <header className="sticky top-0 z-50 border-b border-black/5 bg-white/88 backdrop-blur-xl supports-[backdrop-filter]:bg-white/70">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-2.5 sm:gap-6 sm:px-6 sm:py-3 lg:px-8">
         <div className="flex min-w-0 items-center gap-3 sm:gap-4">
-          <Link to="/" className="flex min-w-0 items-center gap-2.5 sm:gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-black/5 bg-[#f7f0e6] shadow-[0_10px_30px_rgba(0,0,0,0.05)] sm:h-12 sm:w-12">
-              <img src="/MRMLOGO.svg" alt="MRM Ply & Lam" className="h-8 w-auto sm:h-9" />
-            </div>
+          <Link to="/" className="flex min-w-0 items-center gap-3 sm:gap-4">
+            <img src="/MRMLOGO.svg" alt="MRM Ply & Lam" className="h-12 w-auto sm:h-14 lg:h-16" />
             <div className="min-w-0">
               <div className="text-[0.7rem] uppercase tracking-[0.24em] text-[#8b6b52]">MRM</div>
-              <div className="truncate text-sm font-semibold text-[#2b2b2b] sm:text-lg">Ply & Lam</div>
+              <div className="truncate text-base font-semibold text-[#2b2b2b] sm:text-lg">Ply & Lam</div>
             </div>
           </Link>
 
