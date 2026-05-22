@@ -31,7 +31,7 @@ const Header = () => {
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-2.5 sm:gap-6 sm:px-6 sm:py-3 lg:px-8">
         <div className="flex min-w-0 items-center gap-3 sm:gap-4">
           <Link to="/" className="flex min-w-0 items-center gap-3 sm:gap-4">
-            <img src="/MRMLOGO.svg" alt="MRM Ply & Lam" className="h-12 w-auto sm:h-14 lg:h-16" />
+            <img src="/MRMLOGO.svg" alt="MRM Ply & Lam" className="h-[60px] w-[60px] object-contain sm:h-[72px] sm:w-[72px] lg:h-[80px] lg:w-[80px]" />
             <div className="min-w-0">
               <div className="text-[0.7rem] uppercase tracking-[0.24em] text-[#8b6b52]">MRM</div>
               <div className="truncate text-base font-semibold text-[#2b2b2b] sm:text-lg">Ply & Lam</div>
